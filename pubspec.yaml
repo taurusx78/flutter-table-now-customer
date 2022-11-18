@@ -1,0 +1,41 @@
+name: table_now
+description: Table Now
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.15.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  get: ^4.6.1 # GetX 상태관리 라이브러리
+  flutter_adfit: ^1.1.2 # 카카오 애드핏 라이브러리
+  jiffy: ^5.0.0 # 시간계산 라이브러리
+  geolocator: ^9.0.1 # 현재위치 계산 라이브러리 (* 설정 필요!)
+  http: ^0.13.5 # 네트워크 통신 라이브러리
+  naver_map_plugin: ^0.9.6 # 네이버지도 라이브러리
+  fluttertoast: ^8.0.9 # 토스트(알림문구) 라이브러리
+  flutter_swiper: ^1.1.6 # 이미지 스와이퍼 라이브러리
+  url_launcher: ^6.1.0  # 전화 연결 관련 라이브러리
+  share: ^2.0.4  # 공유 라이브러리
+
+  shared_preferences: ^2.0.8 # 로컬 저장용 라이브러리
+  sqflite: ^2.0.0+3 # 로컬 DB 라이브러리
+  path: ^1.8.0 # 로컬 저장소 경로 관련 라이브러리
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^1.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
