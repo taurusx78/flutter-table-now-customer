@@ -118,6 +118,8 @@ class SearchPage extends GetView<SearchController> {
           _storeController.findAllByName(value);
           // 연관검색어 매장 목록 초기화
           controller.initializeRelatedStoreList();
+          // 검색 필터 & 정렬 선택항목 초기화
+          _storeController.initializeFilterSort();
           // 검색결과 페이지로 이동
           Get.toNamed(Routes.searchResults, arguments: value)!.then((value) {
             _focusNode.requestFocus(); // TextField 포커스 유지
