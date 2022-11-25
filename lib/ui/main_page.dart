@@ -12,7 +12,7 @@ class MainPage extends GetView<MainController> {
 
   final List<Widget> pages = [
     HomePage(),
-    CategoryPage(),
+    const CategoryPage(),
     BookmarkPage(),
     const AppInfoPage(),
   ];

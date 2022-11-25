@@ -32,8 +32,8 @@ class SearchResultsPage extends GetView<SearchController> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           // 검색바
-          title: _buildSearchTextField(),
-          toolbarHeight: 70,
+          title: _buildSearchTextField(context),
+          toolbarHeight: 75,
         ),
         body: Container(
           width: 600,
@@ -47,7 +47,7 @@ class SearchResultsPage extends GetView<SearchController> {
                   LocationBar(tapFunc: () async {
                     String result = await Get.find<LocationController>()
                         .getCurrentLocation();
-                    showToast(result);
+                    showToast(context, result);
                     // 현재위치를 기반으로 검색매장 다시조회
                     _storeController.findAllByName(controller.search.text);
                   }),
@@ -93,7 +93,7 @@ class SearchResultsPage extends GetView<SearchController> {
   }
 
   // *** 최대 길이 지정!
-  Widget _buildSearchTextField() {
+  Widget _buildSearchTextField(context) {
     return TextField(
       controller: controller.search,
       focusNode: _focusNode,
@@ -145,7 +145,7 @@ class SearchResultsPage extends GetView<SearchController> {
         } else {
           _focusNode.requestFocus(); // TextField 포커스 유지
           controller.search.clear();
-          showToast('검색어를 입력해 주세요.');
+          showToast(context, '검색어를 입력해 주세요.');
         }
       },
     );

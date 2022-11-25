@@ -53,7 +53,7 @@ class CategoryPage extends StatelessWidget {
                   tapFunc: () async {
                     String result = await Get.find<LocationController>()
                         .getCurrentLocation();
-                    showToast(result);
+                    showToast(context, result);
                   },
                 ),
                 const SizedBox(height: 20),

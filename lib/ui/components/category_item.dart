@@ -20,24 +20,30 @@ class CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(5),
+    return GestureDetector(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // 이미지
           Container(
+            width: 70,
+            height: 70,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              border: Border.all(color: blueGrey, width: 5),
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: blueGrey, width: 2),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(50),
-              child: Image.asset('assets/images/$image'),
+              borderRadius: BorderRadius.circular(25),
+              child: Image.asset(
+                'assets/images/$image',
+              ),
             ),
           ),
           // 라벨
-          Text(label, style: TextStyle(fontSize: fontSize)),
+          Text(
+            label,
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
       onTap: () {

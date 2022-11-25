@@ -64,7 +64,7 @@ class DetailsPage extends GetView<DetailsController> {
                       expandedHeight: 280,
                       // 즐겨찾기 추가/삭제 버튼
                       actions: [
-                        _buildLikeToggleButton(),
+                        _buildLikeToggleButton(context),
                       ],
                       foregroundColor: controller.appBarIconColor.value,
                       elevation: 0.5,
@@ -100,12 +100,12 @@ class DetailsPage extends GetView<DetailsController> {
             }
           },
         ),
-        floatingActionButton: _buildStateUpdateButton(),
+        floatingActionButton: _buildStateUpdateButton(context),
       ),
     );
   }
 
-  Widget _buildStateUpdateButton() {
+  Widget _buildStateUpdateButton(context) {
     return FloatingActionButton(
       onPressed: () async {
         // 버튼 회전 애니메이션
@@ -113,9 +113,9 @@ class DetailsPage extends GetView<DetailsController> {
         // 영업상태 업데이트
         int result = await controller.updateState(storeId);
         if (result == 1) {
-          showToast('정보가 업데이트 되었습니다.');
+          showToast(context, '정보가 업데이트 되었습니다.');
         } else {
-          showToast('오류가 발생했습니다. 잠시후 다시 시도해주세요.');
+          showErrorToast(context);
         }
       },
       backgroundColor: Colors.blueGrey,
@@ -207,7 +207,7 @@ class DetailsPage extends GetView<DetailsController> {
     );
   }
 
-  Widget _buildLikeToggleButton() {
+  Widget _buildLikeToggleButton(context) {
     return IconButton(
       splashRadius: 20,
       icon: !controller.isBookmarked.value
@@ -220,7 +220,7 @@ class DetailsPage extends GetView<DetailsController> {
             ),
       onPressed: () async {
         String result = await controller.changeIsBookmarked(storeId);
-        showToast(result);
+        showToast(context, result);
       },
     );
   }
@@ -680,7 +680,7 @@ class DetailsPage extends GetView<DetailsController> {
                       Navigator.pop(context); // alertDialog 닫기
                       _showSendMailDialog(context);
                     } else {
-                      showToast('항목을 최소 하나 선택해주세요.');
+                      showToast(context, '항목을 최소 하나 선택해주세요.');
                     }
                   },
                 ),
@@ -717,17 +717,17 @@ class DetailsPage extends GetView<DetailsController> {
     showDialog(
       context: context,
       barrierDismissible: false, // Dialog 밖의 화면 터치 못하도록 설정
-      builder: (BuildContext context) {
+      builder: (BuildContext context2) {
         return DialogUI(
           content: '[${controller.store.value.name!}]에 정보수정 제안 메일을 전송하시겠습니까?',
           checkFunc: () async {
-            Navigator.pop(context); // alertDialog 닫기
+            Navigator.pop(context2); // alertDialog 닫기
             // 매장정보 수정제안
             int result = await controller.requestUpdate(storeId);
             if (result == 1) {
-              showToast('메일이 전송되었습니다.');
+              showToast(context, '메일이 전송되었습니다.');
             } else {
-              showToast('오류가 발생했습니다. 잠시후 다시 시도해주세요.');
+              showErrorToast(context);
             }
           },
         );

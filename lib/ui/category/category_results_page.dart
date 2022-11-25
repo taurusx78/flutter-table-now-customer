@@ -55,7 +55,7 @@ class CategoryResultsPage extends GetView<StoreController> {
             LocationBar(tapFunc: () async {
               String result =
                   await Get.find<LocationController>().getCurrentLocation();
-              showToast(result);
+              showToast(context, result);
               // 현재위치를 기반으로 카테고리 매장 다시조회
               controller.findAllByCategory(category);
             }),

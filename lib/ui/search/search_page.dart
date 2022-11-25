@@ -27,8 +27,8 @@ class SearchPage extends GetView<SearchController> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           // 검색바
-          title: _buildSearchTextField(),
-          toolbarHeight: 70,
+          title: _buildSearchTextField(context),
+          toolbarHeight: 75,
         ),
         body: Container(
           width: 600,
@@ -42,7 +42,8 @@ class SearchPage extends GetView<SearchController> {
                   Obx(
                     () => controller.history.isNotEmpty
                         ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 20),
                             child: _buildHistoryHeader(context),
                           )
                         : const SizedBox(),
@@ -73,21 +74,21 @@ class SearchPage extends GetView<SearchController> {
   }
 
   // *** 최대 길이 지정!
-  Widget _buildSearchTextField() {
+  Widget _buildSearchTextField(context) {
     return TextField(
       controller: controller.search,
       focusNode: _focusNode,
       autofocus: true,
-      style: const TextStyle(fontSize: 15),
+      style: const TextStyle(fontSize: 16),
       decoration: InputDecoration(
         hintText: '지역 + 매장명을 입력해 주세요.',
-        hintStyle: const TextStyle(fontSize: 15, color: Colors.black54),
+        hintStyle: const TextStyle(fontSize: 16, color: Colors.black54),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         // 입력값 길어질 때 텍스트 가리지 않도록 설정
@@ -130,7 +131,7 @@ class SearchPage extends GetView<SearchController> {
         } else {
           _focusNode.requestFocus(); // TextField 포커스 유지
           controller.search.clear();
-          showToast('검색어를 입력해 주세요.');
+          showToast(context, '검색어를 입력해 주세요.');
         }
       },
     );
@@ -138,15 +139,7 @@ class SearchPage extends GetView<SearchController> {
 
   Widget _buildRelatedStoreList() {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(
-          color: controller.relatedStoreList.isNotEmpty
-              ? blueGrey
-              : Colors.transparent,
-        ),
-        color: Colors.white,
-      ),
+      color: Colors.white,
       child: ListView.builder(
         itemCount: controller.relatedStoreList.length,
         itemBuilder: (context, index) {
@@ -188,15 +181,15 @@ class SearchPage extends GetView<SearchController> {
       children: [
         const Text(
           '최근검색어',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
         ),
         InkWell(
           child: const Text(
             '전체삭제',
-            style: TextStyle(color: Colors.black54),
+            style: TextStyle(fontSize: 15, color: Colors.black54),
           ),
           onTap: () async {
-            _showDialog(context, '최근검색어를 전체삭제 하시겠습니까?', () async {
+            _showDialog(context, '검색기록을 전체삭제 하시겠습니까?', () async {
               Navigator.pop(context);
               await controller.deleteAllHistory();
             });
@@ -227,7 +220,7 @@ class SearchPage extends GetView<SearchController> {
                   child: Text(
                     controller.history[historyLen - index - 1]
                         .replaceAll('', '\u{200B}'), // 말줄임 에러 방지
-                    style: const TextStyle(fontSize: 15, color: primaryColor),
+                    style: const TextStyle(fontSize: 16),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1, // 한 줄 말줄임
                   ),
@@ -262,8 +255,8 @@ class SearchPage extends GetView<SearchController> {
                 splashRadius: 20,
                 icon: const Icon(
                   Icons.clear,
-                  size: 15,
-                  color: Colors.black54,
+                  size: 17,
+                  color: primaryColor,
                 ),
                 onPressed: () async {
                   // 최근검색어에서 삭제
@@ -275,7 +268,7 @@ class SearchPage extends GetView<SearchController> {
         ],
       ),
       separatorBuilder: (context, index) => Container(
-        height: 0.5,
+        height: 1,
         color: blueGrey,
       ),
     );
@@ -283,7 +276,6 @@ class SearchPage extends GetView<SearchController> {
 
   Widget _buildNoHistoryBox() {
     return Container(
-      height: 150,
       decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(color: blueGrey, width: 0.5),

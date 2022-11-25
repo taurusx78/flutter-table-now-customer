@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:table_now/controller/main_controller.dart';
@@ -8,7 +10,6 @@ import 'package:table_now/ui/components/category_item.dart';
 import 'package:table_now/ui/components/kakao_banner_ad.dart';
 import 'package:table_now/ui/components/state_round_box.dart';
 import 'package:table_now/ui/custom_color.dart';
-import 'package:table_now/ui/screen_size.dart';
 import 'package:table_now/util/host.dart';
 
 class HomePage extends StatelessWidget {
@@ -23,40 +24,51 @@ class HomePage extends StatelessWidget {
         body: Align(
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
-            child: Container(
+            child: SizedBox(
               width: 600,
-              margin: const EdgeInsets.all(15),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 앱 제목
-                  _buildAppTitle(),
-                  const SizedBox(height: 30),
-                  // 검색바
-                  _buildSearchBar(),
-                  const SizedBox(height: 20),
-                  // 카테고리 목록
-                  _buildCategoryList(),
-                  const SizedBox(height: 20),
-                  // 광고
-                  const KakaoBannerAd(),
-                  const SizedBox(height: 20),
-                  // 즐겨찾기 헤더
-                  _buildBookmarkHeader(),
-                  const SizedBox(height: 15),
-                  Obx(
-                    () => controller.isLoaded.value
-                        ? controller.bookmarkList.isNotEmpty
-                            ? _buildBookmarkList()
-                            : _buildNoBookmarkBox()
-                        : const SizedBox(
-                            height: 200,
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: primaryColor,
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          ),
+                  Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: _buildAppTitle(),
+                  ),
+                  // 배너 광고
+                  _buildBannerImageSwiper(),
+                  Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Column(
+                      children: [
+                        // 검색바
+                        _buildSearchBar(),
+                        const SizedBox(height: 30),
+                        // 카테고리 목록
+                        _buildCategoryList(),
+                        const SizedBox(height: 30),
+                        // 광고
+                        const KakaoBannerAd(),
+                        const SizedBox(height: 20),
+                        // 즐겨찾기 헤더
+                        _buildBookmarkHeader(),
+                        const SizedBox(height: 15),
+                        Obx(
+                          () => controller.isLoaded.value
+                              ? controller.bookmarkList.isNotEmpty
+                                  ? _buildBookmarkList()
+                                  : _buildNoBookmarkBox()
+                              : const SizedBox(
+                                  height: 200,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: primaryColor,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -70,9 +82,9 @@ class HomePage extends StatelessWidget {
   Widget _buildAppTitle() {
     return RichText(
       text: const TextSpan(
-        text: 'TABLE ',
+        text: ' TABLE ',
         style: TextStyle(
-          fontSize: 25,
+          fontSize: 30,
           fontWeight: FontWeight.bold,
           color: Colors.black,
         ),
@@ -86,24 +98,45 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  Widget _buildBannerImageSwiper() {
+    return SizedBox(
+      height: 250, // 높이 지정 필수!
+      child: Swiper(
+        itemCount: 2,
+        itemBuilder: (context, index) {
+          return Image.asset(
+            'assets/test_banner/배너 이미지 ${index + 1}.jpg',
+            fit: BoxFit.cover,
+          );
+        },
+        autoplay: true,
+        pagination: const SwiperPagination(
+          margin: EdgeInsets.all(5.0),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSearchBar() {
     return GestureDetector(
       child: Container(
-        width: 600,
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+        height: 55,
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(color: primaryColor, width: 2),
         ),
-        child: Row(
-          children: const [
-            Icon(Icons.search, color: primaryColor),
-            SizedBox(width: 10),
-            Text(
-              '궁금한 매장은 어디인가요?',
-              style: TextStyle(fontSize: 15, color: Colors.black54),
-            )
-          ],
+        child: Center(
+          child: Row(
+            children: const [
+              Icon(Icons.search, size: 25, color: primaryColor),
+              SizedBox(width: 10),
+              Text(
+                '궁금한 매장은 어디인가요?',
+                style: TextStyle(fontSize: 16, color: darkNavy),
+              )
+            ],
+          ),
         ),
       ),
       onTap: () {
@@ -114,34 +147,40 @@ class HomePage extends StatelessWidget {
 
   Widget _buildCategoryList() {
     return SizedBox(
-      width: 500,
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: 10,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 5, // 행에 보여줄 item 개수
-          mainAxisSpacing: 10, // item 수직 간격
-          crossAxisSpacing: 10, // item 수평 간격
-          childAspectRatio: 1 / 1.32, // item 너비:높이 비율
-        ),
+      height: 95, // 높이 지정 필수!
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: 5,
         itemBuilder: (context, index) {
-          double fontSize = getScreenWidth(context) < 500 ? 12.5 : 14;
-          if (index < 9) {
+          4;
+          if (index < 4) {
             return CategoryItem(
               label: categoryList[index].label,
               image: categoryList[index].image,
-              fontSize: fontSize,
+              fontSize: 14,
             );
           } else {
-            return InkWell(
-              borderRadius: BorderRadius.circular(5),
+            return GestureDetector(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(height: 1), // 자식 위젯 간 간격 조절을 위해 삽입
-                  const Icon(Icons.more_horiz, size: 30, color: primaryColor),
-                  Text('더보기', style: TextStyle(fontSize: fontSize)),
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: blueGrey, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.more_horiz,
+                      size: 40,
+                      color: primaryColor,
+                    ),
+                  ),
+                  const Text(
+                    '더보기',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
               onTap: () {
@@ -150,6 +189,7 @@ class HomePage extends StatelessWidget {
             );
           }
         },
+        separatorBuilder: (context, index) => const SizedBox(width: 10),
       ),
     );
   }
@@ -160,14 +200,14 @@ class HomePage extends StatelessWidget {
       children: [
         const Text(
           '즐겨찾기',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
         ),
         InkWell(
           child: Row(
             children: const [
               Text(
                 '전체보기',
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(fontSize: 15, color: Colors.black54),
               ),
               Icon(
                 Icons.keyboard_arrow_right_rounded,
@@ -186,7 +226,7 @@ class HomePage extends StatelessWidget {
 
   Widget _buildBookmarkList() {
     return SizedBox(
-      height: 260, // 높이 지정 필수!
+      height: 270, // 높이 지정 필수!
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: controller.bookmarkList.length,
@@ -219,21 +259,21 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 7),
           // 매장명
           Text(
             store.name.replaceAll('', '\u{200B}'), // 말줄임 에러 방지
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             overflow: TextOverflow.ellipsis,
             maxLines: 1, // 한 줄 말줄임
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 7),
           // 영업상태
           StateRoundBox(
             state: store.state,
             tableCount: store.tableCount,
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 7),
           // 업데이트 시간
           RichText(
             text: TextSpan(
@@ -242,12 +282,12 @@ class HomePage extends StatelessWidget {
                   child: Icon(
                     Icons.update,
                     color: Colors.black54,
-                    size: 16,
+                    size: 17,
                   ),
                 ),
                 TextSpan(
                   text: ' 업데이트 ' + Jiffy(store.updated).fromNow(),
-                  style: const TextStyle(fontSize: 13, color: Colors.black54),
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),
               ],
             ),
@@ -275,14 +315,14 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
             Icon(
-              Icons.star_rounded,
-              color: primaryColor,
+              Icons.favorite_border_rounded,
+              color: red,
               size: 35,
             ),
             SizedBox(height: 10),
             Text(
               '관심 매장을 등록해 보세요!',
-              style: TextStyle(fontSize: 15, color: Colors.black54),
+              style: TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ],
         ),

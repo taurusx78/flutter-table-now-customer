@@ -100,7 +100,7 @@ class NaverMapPage extends StatelessWidget {
                         ),
                         onTap: () {
                           Clipboard.setData(ClipboardData(text: address));
-                          showToast('주소가 복사되었습니다.');
+                          showToast(context, '주소가 복사되었습니다.');
                         },
                       ),
                     ],

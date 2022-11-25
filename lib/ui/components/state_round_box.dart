@@ -39,8 +39,8 @@ class StateRoundBox extends StatelessWidget {
     }
 
     return Container(
-      width: 80,
       height: 30,
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: color,

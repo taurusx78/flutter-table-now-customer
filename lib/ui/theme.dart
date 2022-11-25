@@ -17,5 +17,11 @@ ThemeData theme() {
     ),
     // splashColor: primaryColor.withOpacity(0.1),
     // highlightColor: primaryColor.withOpacity(0.1),
+    checkboxTheme: CheckboxThemeData(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      side: const BorderSide(width: 1.5, color: Colors.black26),
+    ),
   );
 }
