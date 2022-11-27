@@ -1,1 +1,1 @@
-const host = 'http://10.51.14.103:8080/api/v1';
+const host = 'http://192.168.0.26:8080/api/v1';

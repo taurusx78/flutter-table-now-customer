@@ -42,18 +42,19 @@ class StoreItem extends StatelessWidget {
               ),
             ),
             Container(
-              width: getScreenWidth(context) - 30 < 500
+              width: getScreenWidth(context) - 30 < 600
                   ? getScreenWidth(context) - 132
                   : 498,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // 매장명
                   Text(
                     store.name.replaceAll('', '\u{200B}'), // 말줄임 에러 방지,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -78,6 +79,7 @@ class StoreItem extends StatelessWidget {
                   const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // 업데이트 시간
                       Row(
@@ -85,12 +87,12 @@ class StoreItem extends StatelessWidget {
                           const Icon(
                             Icons.update,
                             color: Colors.black54,
-                            size: 15,
+                            size: 17,
                           ),
                           Text(
                             ' 업데이트 ' + Jiffy(store.updated).fromNow(),
                             style: const TextStyle(
-                              fontSize: 13,
+                              fontSize: 14,
                               color: Colors.black54,
                             ),
                           )

@@ -47,7 +47,7 @@ class CategoryResultsPage extends GetView<StoreController> {
       ),
       body: Container(
         width: 600,
-        margin: const EdgeInsets.fromLTRB(15, 5, 15, 15),
+        margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -59,17 +59,16 @@ class CategoryResultsPage extends GetView<StoreController> {
               // 현재위치를 기반으로 카테고리 매장 다시조회
               controller.findAllByCategory(category);
             }),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
+            // 필터 & 드롭다운
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 영업상태 필터
                 StateFilter(),
-                // 매장 정렬 드롭다운
                 SortDropdown(),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             // 검색결과 헤더
             Obx(() => _buildResultsHeader()),
             const SizedBox(height: 15),

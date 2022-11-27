@@ -13,10 +13,10 @@ class LocationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50,
+      height: 55,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(10),
         color: lightGrey,
       ),
       child: Row(
@@ -35,7 +35,7 @@ class LocationBar extends StatelessWidget {
                     ? Text(
                         controller.myLocation.value,
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       )

@@ -19,6 +19,7 @@ class HelpPage extends StatelessWidget {
           },
         ),
         title: const Text('도움말'),
+        elevation: 0.5,
       ),
       // body: ,
     );

@@ -16,7 +16,8 @@ class StateFilter extends StatelessWidget {
           _storeController.filterList.length,
           (index) {
             bool isSelected = _storeController.curFilterIndex.value == index;
-            return Padding(
+            return Container(
+              height: 35,
               padding: const EdgeInsets.only(right: 7),
               child: ChoiceChip(
                 label: Text(_storeController.filterList[index]),

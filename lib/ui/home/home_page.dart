@@ -147,7 +147,7 @@ class HomePage extends StatelessWidget {
 
   Widget _buildCategoryList() {
     return SizedBox(
-      height: 95, // 높이 지정 필수!
+      height: 100, // 높이 지정 필수!
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: 5,
@@ -165,16 +165,23 @@ class HomePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    width: 70,
-                    height: 70,
+                    width: 75,
+                    height: 75,
+                    padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: blueGrey, width: 2),
+                      border: Border.all(color: blueGrey, width: 1),
                     ),
-                    child: const Icon(
-                      Icons.more_horiz,
-                      size: 40,
-                      color: primaryColor,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: lightGrey,
+                      ),
+                      child: const Icon(
+                        Icons.more_horiz,
+                        size: 40,
+                        color: primaryColor,
+                      ),
                     ),
                   ),
                   const Text(

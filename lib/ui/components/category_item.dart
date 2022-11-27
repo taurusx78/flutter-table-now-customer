@@ -26,11 +26,12 @@ class CategoryItem extends StatelessWidget {
         children: [
           // 이미지
           Container(
-            width: 70,
-            height: 70,
+            width: 75,
+            height: 75,
+            padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25),
-              border: Border.all(color: blueGrey, width: 2),
+              border: Border.all(color: blueGrey),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),

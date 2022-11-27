@@ -45,7 +45,7 @@ class CategoryPage extends StatelessWidget {
                 // 위치 확인 문구
                 const Text(
                   '현재 위치를 확인해 주세요.',
-                  style: TextStyle(color: primaryColor),
+                  style: TextStyle(fontSize: 15, color: primaryColor),
                 ),
                 const SizedBox(height: 15),
                 // 현재 위치
@@ -56,9 +56,9 @@ class CategoryPage extends StatelessWidget {
                     showToast(context, result);
                   },
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
                 // 카테고리 목록
-                _buildCategoryList(),
+                _buildCategoryList(context),
                 const SizedBox(height: 20),
               ],
             ),
@@ -68,24 +68,25 @@ class CategoryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryList() {
+  Widget _buildCategoryList(context) {
     return SizedBox(
-      width: 500,
+      width: 600,
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: categoryList.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 5, // 행에 보여줄 item 개수
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount:
+              getScreenWidth(context) - 30 < 600 ? 4 : 5, // 행에 보여줄 item 개수
           mainAxisSpacing: 10, // item 수직 간격
           crossAxisSpacing: 10, // item 수평 간격
-          childAspectRatio: 1 / 1.32, // item 너비:높이 비율
+          childAspectRatio: 1 / 1.2, // item 너비:높이 비율
         ),
         itemBuilder: (context, index) {
           return CategoryItem(
             label: categoryList[index].label,
             image: categoryList[index].image,
-            fontSize: getScreenWidth(context) < 500 ? 12.5 : 14,
+            fontSize: 14,
           );
         },
       ),

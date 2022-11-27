@@ -37,7 +37,7 @@ class SearchResultsPage extends GetView<SearchController> {
         ),
         body: Container(
           width: 600,
-          margin: const EdgeInsets.fromLTRB(15, 5, 15, 15),
+          margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
           child: Stack(
             children: [
               Column(
@@ -51,17 +51,16 @@ class SearchResultsPage extends GetView<SearchController> {
                     // 현재위치를 기반으로 검색매장 다시조회
                     _storeController.findAllByName(controller.search.text);
                   }),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 15),
+                  // 필터 & 드롭다운
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 영업상태 필터
                       StateFilter(),
-                      // 매장 정렬 드롭다운
                       SortDropdown(),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   // 검색결과 헤더
                   Obx(() => _buildResultsHeader()),
                   const SizedBox(height: 15),
@@ -103,11 +102,11 @@ class SearchResultsPage extends GetView<SearchController> {
         hintText: '지역 + 매장명을 입력해 주세요.',
         hintStyle: const TextStyle(fontSize: 15, color: Colors.black54),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         // 입력값 길어질 때 텍스트 가리지 않도록 설정

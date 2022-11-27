@@ -25,8 +25,10 @@ class StoreController extends GetxController {
     allStoreList.value = await _storeRepository.findAllByName(
         name, _locationController.myLat.value, _locationController.myLon.value);
     if (allStoreList.isNotEmpty) {
-      // 선택된 필터 적용
+      // 검색 결과 있는 경우, 선택된 필터 적용
       filterStoreList();
+    } else {
+      filteredStoreList.value = [];
     }
 
     isLoaded.value = true;
