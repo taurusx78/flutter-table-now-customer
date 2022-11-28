@@ -2,8 +2,8 @@ class Notice {
   final int id; // 알림 id
   final String title; // 제목
   final String content; // 내용
-  final String holidayStart; // 임시휴무 시작일
-  final String holidayEnd; // 임시휴무 종료일
+  final String holidayStartDate; // 임시휴무 시작일
+  final String holidayEndDate; // 임시휴무 종료일
   final String createdDate; // 알림 등록일
   final List<String> imageUrlList; // 알림 첨부사진 목록
 
@@ -11,8 +11,8 @@ class Notice {
     required this.id,
     required this.title,
     required this.content,
-    required this.holidayStart,
-    required this.holidayEnd,
+    required this.holidayStartDate,
+    required this.holidayEndDate,
     required this.createdDate,
     required this.imageUrlList,
   });
@@ -22,8 +22,8 @@ class Notice {
       : id = json['id'],
         title = json['title'],
         content = json['content'],
-        holidayStart = json['holidayStart'],
-        holidayEnd = json['holidayEnd'],
-        createdDate = json['createdDate'],
+        holidayStartDate = json['holidayStartDate'].replaceAll('-', '.'),
+        holidayEndDate = json['holidayEndDate'].replaceAll('-', '.'),
+        createdDate = json['createdDate'].substring(2, 10).replaceAll('-', '.'),
         imageUrlList = List.from(json['imageUrlList']);
 }

@@ -6,6 +6,8 @@ import 'package:table_now/data/store/store_repository.dart';
 import 'package:table_now/data/sqlite_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'dto/hours_resp.dart';
+
 class DetailsController extends GetxController {
   final StoreRepository _storeRepository = StoreRepository();
   final Rx<Store> store = Store().obs;
@@ -18,6 +20,9 @@ class DetailsController extends GetxController {
 
   final RxBool isLoaded = true.obs; // 상세보기 조회 완료 여부
   final RxBool isBookmarked = false.obs; // 즐겨찾기 포함 여부
+
+  final Rx<HoursResp> weeklyHours = HoursResp().obs; // 전체 영업시간
+  final RxBool isHoursLoaded = true.obs; // 전체 영업시간 조회 완료 여부
 
   // 대표사진 현재 인덱스
   final RxInt curBasicImageIndex = 0.obs;
@@ -39,6 +44,7 @@ class DetailsController extends GetxController {
   // 스크롤에 따라 앱바 텍스트 색상 변경
   final ScrollController scrollController = ScrollController();
   final Rx<Color> appBarIconColor = Colors.white.obs; // 앱바 아이콘 색상
+  final Rx<Color> appBarTextColor = Colors.transparent.obs; // 앱바 텍스트 색상
 
   // 업데이트 버튼 회전 애니메이션
   RxDouble turns = 0.0.obs;
@@ -54,6 +60,8 @@ class DetailsController extends GetxController {
     scrollController.addListener(() {
       appBarIconColor.value =
           isSliverAppBarExpanded() ? Colors.white : Colors.black;
+      appBarTextColor.value =
+          isSliverAppBarExpanded() ? Colors.transparent : Colors.black;
     });
   }
 
@@ -63,7 +71,9 @@ class DetailsController extends GetxController {
   }
 
   // 매장 상세조회
-  Future<bool> findById(int storeId) async {
+  Future<void> findById(int storeId) async {
+    isLoaded.value = false;
+
     store.value = await _storeRepository.findById(storeId);
     // 즐겨찾기 포함 여부 조회
     await checkIsBookmarked(storeId);
@@ -73,7 +83,8 @@ class DetailsController extends GetxController {
     businessHours.value = store.value.businessHours!;
     breakTime.value = store.value.breakTime!;
     lastOrder.value = store.value.lastOrder!;
-    return true;
+
+    isLoaded.value = true;
   }
 
   // 즐겨찾기 포함 여부 조회
@@ -104,6 +115,14 @@ class DetailsController extends GetxController {
       await SqliteHelper.deleteByStoreId(storeId);
       return '즐겨찾기에서 제거되었습니다.';
     }
+  }
+
+  // 영업시간 전체조회
+  Future<void> findHours(int storeId) async {
+    isHoursLoaded.value = false;
+    await Future.delayed(Duration(seconds: 2));
+    weeklyHours.value = await _storeRepository.findHours(storeId);
+    isHoursLoaded.value = true;
   }
 
   // 영업상태 업데이트

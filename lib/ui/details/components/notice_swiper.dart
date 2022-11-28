@@ -30,7 +30,7 @@ class NoticeSwiper extends StatelessWidget {
             children: [
               const Text(
                 '알림',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 5),
               Text(
@@ -56,7 +56,6 @@ class NoticeSwiper extends StatelessWidget {
               loop: false,
             ),
           ),
-          // const CustomDivider(),
           Container(
             height: 1,
             color: blueGrey,
@@ -71,7 +70,7 @@ class NoticeSwiper extends StatelessWidget {
     // 첨부사진 유무
     bool existImage = notice.imageUrlList.isNotEmpty;
     // 임시휴무 유무
-    bool hasHoliday = notice.holidayStart != '';
+    bool hasHoliday = notice.holidayStartDate != '';
 
     return GestureDetector(
       child: Stack(
@@ -142,8 +141,8 @@ class NoticeSwiper extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 5),
                           child: _buildHolidayText(
-                            notice.holidayStart,
-                            notice.holidayEnd,
+                            notice.holidayStartDate,
+                            notice.holidayEndDate,
                             18,
                             15,
                           ),
@@ -225,14 +224,15 @@ class NoticeSwiper extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
-                                children: const [
+                                children: [
                                   // 알림 라벨
-                                  NoticeRoundText(title: '알림'),
+                                  const NoticeRoundText(title: '알림'),
                                   // 휴무 라벨
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 8),
-                                    child: NoticeRoundText(title: '휴무'),
-                                  ),
+                                  if (hasHoliday)
+                                    const Padding(
+                                      padding: EdgeInsets.only(left: 8),
+                                      child: NoticeRoundText(title: '휴무'),
+                                    ),
                                 ],
                               ),
                               // 알림 등록일
@@ -254,18 +254,18 @@ class NoticeSwiper extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 10),
                           // 휴무 알림인 경우
                           if (hasHoliday)
                             Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.only(top: 10),
                               child: _buildHolidayText(
-                                notice.holidayStart,
-                                notice.holidayEnd,
+                                notice.holidayStartDate,
+                                notice.holidayEndDate,
                                 20,
                                 16,
                               ),
                             ),
+                          const SizedBox(height: 15),
                           // 내용
                           Text(notice.content),
                         ],
@@ -293,7 +293,7 @@ class NoticeSwiper extends StatelessWidget {
               child: Icon(
                 Icons.event_note,
                 size: iconSize,
-                color: Colors.blueGrey,
+                color: red,
               ),
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:table_now/controller/details_controller.dart';
 import 'package:table_now/controller/dto/store_resp.dart';
 import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/state_round_box.dart';
@@ -112,6 +113,8 @@ class StoreItem extends StatelessWidget {
         ),
       ),
       onTap: () async {
+        // 매장 상세조회 (비동기 조회)
+        Get.put(DetailsController()).findById(store.id);
         Get.toNamed(Routes.details, arguments: store.id);
       },
     );

@@ -24,6 +24,9 @@ class StoreProvider extends GetConnect {
   // 매장 상세조회
   Future<Response> findById(int id) => get('$host/store/$id');
 
+  // 영업시간 전체조회
+  Future<Response> findHours(int id) => get('$host/store/$id/hours');
+
   // 영업상태 업데이트
   Future<Response> updateState(int id) => get('$host/store/$id/state');
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:table_now/controller/details_controller.dart';
 import 'package:table_now/controller/main_controller.dart';
 import 'package:table_now/data/category.dart';
 import 'package:table_now/route/routes.dart';
@@ -10,6 +11,7 @@ import 'package:table_now/ui/components/category_item.dart';
 import 'package:table_now/ui/components/kakao_banner_ad.dart';
 import 'package:table_now/ui/components/state_round_box.dart';
 import 'package:table_now/ui/custom_color.dart';
+import 'package:table_now/ui/screen_size.dart';
 import 'package:table_now/util/host.dart';
 
 class HomePage extends StatelessWidget {
@@ -35,9 +37,9 @@ class HomePage extends StatelessWidget {
                     child: _buildAppTitle(),
                   ),
                   // 배너 광고
-                  _buildBannerImageSwiper(),
+                  _buildBannerImageSwiper(context),
                   Padding(
-                    padding: const EdgeInsets.all(15),
+                    padding: const EdgeInsets.fromLTRB(15, 20, 15, 15),
                     child: Column(
                       children: [
                         // 검색바
@@ -98,20 +100,27 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBannerImageSwiper() {
-    return SizedBox(
+  Widget _buildBannerImageSwiper(context) {
+    bool notWide = getScreenWidth(context) - 30 < 600;
+
+    return Container(
       height: 250, // 높이 지정 필수!
-      child: Swiper(
-        itemCount: 2,
-        itemBuilder: (context, index) {
-          return Image.asset(
-            'assets/test_banner/배너 이미지 ${index + 1}.jpg',
-            fit: BoxFit.cover,
-          );
-        },
-        autoplay: true,
-        pagination: const SwiperPagination(
-          margin: EdgeInsets.all(5.0),
+      padding: notWide ? null : const EdgeInsets.symmetric(horizontal: 15),
+      child: ClipRRect(
+        borderRadius:
+            notWide ? BorderRadius.circular(0) : BorderRadius.circular(10),
+        child: Swiper(
+          itemCount: 2,
+          itemBuilder: (context, index) {
+            return Image.asset(
+              'assets/test_banner/배너 이미지 ${index + 1}.jpg',
+              fit: BoxFit.cover,
+            );
+          },
+          autoplay: true,
+          pagination: const SwiperPagination(
+            margin: EdgeInsets.all(5.0),
+          ),
         ),
       ),
     );
@@ -149,6 +158,7 @@ class HomePage extends StatelessWidget {
     return SizedBox(
       height: 100, // 높이 지정 필수!
       child: ListView.separated(
+        shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         itemCount: 5,
         itemBuilder: (context, index) {
@@ -301,7 +311,9 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      onTap: () {
+      onTap: () async {
+        // 매장 상세조회 (비동기 조회)
+        Get.put(DetailsController()).findById(store.id);
         Get.toNamed(Routes.details, arguments: store.id);
       },
     );

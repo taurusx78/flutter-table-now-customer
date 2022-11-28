@@ -75,7 +75,7 @@ class Store {
         insideImageUrlList = List.from(json['insideImageUrlList']),
         insideModified = json['insideModified'],
         menuImageUrlList = List.from(json['menuImageUrlList']),
-        menuModified = json['menuModified'],
+        menuModified = json['menuModified'].substring(0, 8),
         allTableCount = json['allTableCount'],
         tableCount = json['tableCount'],
         businessHours = json['businessHours'],

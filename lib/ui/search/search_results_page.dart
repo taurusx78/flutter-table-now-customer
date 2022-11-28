@@ -35,56 +35,60 @@ class SearchResultsPage extends GetView<SearchController> {
           title: _buildSearchTextField(context),
           toolbarHeight: 75,
         ),
-        body: Container(
-          width: 600,
-          margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 현재위치 정보
-                  LocationBar(tapFunc: () async {
-                    String result = await Get.find<LocationController>()
-                        .getCurrentLocation();
-                    showToast(context, result);
-                    // 현재위치를 기반으로 검색매장 다시조회
-                    _storeController.findAllByName(controller.search.text);
-                  }),
-                  const SizedBox(height: 15),
-                  // 필터 & 드롭다운
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      StateFilter(),
-                      SortDropdown(),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // 검색결과 헤더
-                  Obx(() => _buildResultsHeader()),
-                  const SizedBox(height: 15),
-                  // 검색매장 목록
-                  Obx(
-                    () => _storeController.isLoaded.value
-                        ? Expanded(
-                            child: _storeController.filteredStoreList.isNotEmpty
-                                ? _buildResultsStoreList()
-                                : _buildNoStoreBox(),
-                          )
-                        : const LoadingIndicator(height: 200),
-                  ),
-                ],
-              ),
-              // 연관검색어 매장 목록
-              Obx(
-                () => controller.isFilled.value
-                    ? Positioned(
-                        child: _buildRelatedStoreList(),
-                      )
-                    : const SizedBox(),
-              ),
-            ],
+        body: Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            width: 600,
+            margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+            child: Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 현재위치 정보
+                    LocationBar(tapFunc: () async {
+                      String result = await Get.find<LocationController>()
+                          .getCurrentLocation();
+                      showToast(context, result);
+                      // 현재위치를 기반으로 검색매장 다시조회
+                      _storeController.findAllByName(controller.search.text);
+                    }),
+                    const SizedBox(height: 15),
+                    // 필터 & 드롭다운
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        StateFilter(),
+                        SortDropdown(),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    // 검색결과 헤더
+                    Obx(() => _buildResultsHeader()),
+                    const SizedBox(height: 15),
+                    // 검색매장 목록
+                    Obx(
+                      () => _storeController.isLoaded.value
+                          ? Expanded(
+                              child:
+                                  _storeController.filteredStoreList.isNotEmpty
+                                      ? _buildResultsStoreList()
+                                      : _buildNoStoreBox(),
+                            )
+                          : const LoadingIndicator(height: 200),
+                    ),
+                  ],
+                ),
+                // 연관검색어 매장 목록
+                Obx(
+                  () => controller.isFilled.value
+                      ? Positioned(
+                          child: _buildRelatedStoreList(),
+                        )
+                      : const SizedBox(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -93,60 +97,63 @@ class SearchResultsPage extends GetView<SearchController> {
 
   // *** 최대 길이 지정!
   Widget _buildSearchTextField(context) {
-    return TextField(
-      controller: controller.search,
-      focusNode: _focusNode,
-      autofocus: false,
-      style: const TextStyle(fontSize: 15),
-      decoration: InputDecoration(
-        hintText: '지역 + 매장명을 입력해 주세요.',
-        hintStyle: const TextStyle(fontSize: 15, color: Colors.black54),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
+    return SizedBox(
+      width: 600,
+      child: TextField(
+        controller: controller.search,
+        focusNode: _focusNode,
+        autofocus: false,
+        style: const TextStyle(fontSize: 15),
+        decoration: InputDecoration(
+          hintText: '지역 + 매장명을 입력해 주세요.',
+          hintStyle: const TextStyle(fontSize: 15, color: Colors.black54),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: primaryColor, width: 2),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: primaryColor, width: 2),
+          ),
+          // 입력값 길어질 때 텍스트 가리지 않도록 설정
+          isDense: true,
+          prefixIcon: IconButton(
+            splashRadius: 20,
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+          suffixIcon: IconButton(
+            splashRadius: 20,
+            icon: const Icon(Icons.clear_rounded, color: Colors.black54),
+            onPressed: () {
+              controller.search.clear();
+            },
+          ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
-        ),
-        // 입력값 길어질 때 텍스트 가리지 않도록 설정
-        isDense: true,
-        prefixIcon: IconButton(
-          splashRadius: 20,
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () {
-            Get.back();
-          },
-        ),
-        suffixIcon: IconButton(
-          splashRadius: 20,
-          icon: const Icon(Icons.clear_rounded, color: Colors.black54),
-          onPressed: () {
+        onChanged: (value) {
+          // 연관검색어 매장 목록 변경
+          controller.changeRelatedStoreList(value);
+        },
+        onSubmitted: (value) async {
+          value = value.trim(); // 공백 제거
+          if (value.isNotEmpty) {
+            // 검색 매장 전체 조회 (비동기 호출)
+            _storeController.findAllByName(value);
+            // 연관검색어 매장 목록 초기화
+            controller.initializeRelatedStoreList();
+            // 드롭다운 인덱스 초기화
+            _storeController.changeCurSortOption('업데이트순');
+            // 최근검색어 추가
+            await controller.addHistory(value, false);
+          } else {
+            _focusNode.requestFocus(); // TextField 포커스 유지
             controller.search.clear();
-          },
-        ),
+            showToast(context, '검색어를 입력해 주세요.');
+          }
+        },
       ),
-      onChanged: (value) {
-        // 연관검색어 매장 목록 변경
-        controller.changeRelatedStoreList(value);
-      },
-      onSubmitted: (value) async {
-        value = value.trim(); // 공백 제거
-        if (value.isNotEmpty) {
-          // 검색 매장 전체 조회 (비동기 호출)
-          _storeController.findAllByName(value);
-          // 연관검색어 매장 목록 초기화
-          controller.initializeRelatedStoreList();
-          // 드롭다운 인덱스 초기화
-          _storeController.changeCurSortOption('업데이트순');
-          // 최근검색어 추가
-          await controller.addHistory(value, false);
-        } else {
-          _focusNode.requestFocus(); // TextField 포커스 유지
-          controller.search.clear();
-          showToast(context, '검색어를 입력해 주세요.');
-        }
-      },
     );
   }
 

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:get/get.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:share/share.dart';
 import 'package:table_now/controller/details_controller.dart';
+import 'package:table_now/controller/dto/hours_resp.dart';
 import 'package:table_now/data/store/model/store.dart';
 import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/dialog_ui.dart';
 import 'package:table_now/ui/components/loading_indicator.dart';
 import 'package:table_now/ui/components/show_toast.dart';
-import 'package:table_now/ui/components/state_round_box.dart';
 import 'package:table_now/ui/custom_color.dart';
 import 'package:table_now/ui/details/components/custom_divider.dart';
 import 'package:table_now/ui/details/components/hours_bottom_sheet.dart';
@@ -29,78 +30,88 @@ class DetailsPage extends GetView<DetailsController> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: FutureBuilder(
-          future: controller.findById(storeId),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const LoadingIndicator(height: 200);
-            } else {
-              Store store = controller.store.value;
-              // 조회 실패 (네트워크 연결 안됨)
-              if (store.id == null) {
-                return _buildNetworkNotConnected();
-              }
-              return CustomScrollView(
-                controller: controller.scrollController,
-                slivers: [
-                  Obx(
-                    () => SliverAppBar(
-                      // 축소 시 상단에 AppBar 고정
-                      pinned: true,
-                      // 매장명
-                      title: Text(
-                        store.name!,
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: controller.isSliverAppBarExpanded()
-                              ? Colors.transparent
-                              : Colors.black,
+        body: Obx(
+          () => controller.isLoaded.value
+              ? Align(
+                  alignment: Alignment.topCenter,
+                  child: SizedBox(
+                    width: 600,
+                    child: CustomScrollView(
+                      controller: controller.scrollController,
+                      slivers: [
+                        SliverAppBar(
+                          // 축소 시 상단에 AppBar 고정
+                          pinned: true,
+                          // 매장명
+                          title: Text(
+                            controller.store.value.name!,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: controller.appBarTextColor.value,
+                            ),
+                          ),
+                          // 대표사진
+                          flexibleSpace: FlexibleSpaceBar(
+                            background: ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
+                                ),
+                                child: _buildBasicImageList(
+                                    controller.store.value)),
+                          ),
+                          expandedHeight: 280,
+                          // 즐겨찾기 추가/삭제 버튼
+                          actions: [
+                            _buildLikeToggleButton(context),
+                          ],
+                          foregroundColor: controller.appBarIconColor.value,
+                          elevation: 0.5,
                         ),
-                      ),
-                      // 대표사진
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: _buildBasicImageList(store),
-                      ),
-                      expandedHeight: 280,
-                      // 즐겨찾기 추가/삭제 버튼
-                      actions: [
-                        _buildLikeToggleButton(context),
+                        SliverList(
+                          delegate: SliverChildListDelegate([
+                            Column(
+                              children: [
+                                // 매장명/주소/영업상태/기능버튼
+                                _buildMainInfoBox(controller.store.value),
+                                Container(
+                                  height: 3,
+                                  color: blueGrey,
+                                ),
+                                // 알림 목록
+                                if (controller
+                                    .store.value.noticeList!.isNotEmpty)
+                                  NoticeSwiper(
+                                      noticeList:
+                                          controller.store.value.noticeList!),
+                                // 그 외 매장 정보
+                                _buildSubInfoBox(
+                                    context, controller.store.value),
+                                // 블로그 리뷰 목록
+                                if (controller.store.value.blogList!.isNotEmpty)
+                                  NaverBlogList(
+                                      blogList:
+                                          controller.store.value.blogList!),
+                                Container(
+                                  height: 5,
+                                  color: blueGrey,
+                                ),
+                                // 안내문구
+                                _buildGuideText(context),
+                              ],
+                            )
+                          ]),
+                        ),
                       ],
-                      foregroundColor: controller.appBarIconColor.value,
-                      elevation: 0.5,
                     ),
                   ),
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      Column(
-                        children: [
-                          // 매장명/주소/영업상태/기능버튼
-                          _buildMainInfoBox(store),
-                          Container(
-                            height: 1,
-                            color: blueGrey,
-                          ),
-                          // 알림 목록
-                          if (store.noticeList!.isNotEmpty)
-                            NoticeSwiper(noticeList: store.noticeList!),
-                          // 그 외 매장 정보
-                          _buildSubInfoBox(context, store),
-                          Container(
-                            height: 1,
-                            color: blueGrey,
-                          ),
-                          // 안내문구
-                          _buildGuideText(context),
-                        ],
-                      )
-                    ]),
-                  ),
-                ],
-              );
-            }
-          },
+                )
+              : const LoadingIndicator(height: 200),
         ),
-        floatingActionButton: _buildStateUpdateButton(context),
+        floatingActionButton: Obx(
+          () => _buildStateUpdateButton(context),
+        ),
       ),
     );
   }
@@ -113,53 +124,16 @@ class DetailsPage extends GetView<DetailsController> {
         // 영업상태 업데이트
         int result = await controller.updateState(storeId);
         if (result == 1) {
-          showToast(context, '정보가 업데이트 되었습니다.');
+          showToast(context, '영업정보가 업데이트 되었습니다.');
         } else {
           showErrorToast(context);
         }
       },
       backgroundColor: Colors.blueGrey,
-      child: Obx(
-        () => AnimatedRotation(
-          turns: controller.turns.value,
-          duration: const Duration(milliseconds: 500),
-          child: const Icon(Icons.refresh_rounded, size: 30),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNetworkNotConnected() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/images/error.png',
-            width: 50,
-            color: Colors.black54,
-          ),
-          const SizedBox(height: 30),
-          const Text(
-            '정보 불러오기에 실패하였습니다.',
-            style: TextStyle(fontSize: 16, color: Colors.black54),
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            '네트워크 연결을 확인해주세요.',
-            style: TextStyle(fontSize: 16, color: Colors.black54),
-          ),
-          const SizedBox(height: 10),
-          TextButton(
-            child: const Text(
-              '뒤로가기',
-              style: TextStyle(fontSize: 15, color: primaryColor),
-            ),
-            onPressed: () {
-              Get.back();
-            },
-          ),
-        ],
+      child: AnimatedRotation(
+        turns: controller.turns.value,
+        duration: const Duration(milliseconds: 500),
+        child: const Icon(Icons.refresh_rounded, size: 30),
       ),
     );
   }
@@ -196,11 +170,9 @@ class DetailsPage extends GetView<DetailsController> {
         Positioned(
           right: 5,
           bottom: 5,
-          child: Obx(
-            () => IndexIndicator(
-              index: controller.curBasicImageIndex.value + 1,
-              length: basicImageCount,
-            ),
+          child: IndexIndicator(
+            index: controller.curBasicImageIndex.value + 1,
+            length: basicImageCount,
           ),
         ),
       ],
@@ -229,8 +201,13 @@ class DetailsPage extends GetView<DetailsController> {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 카테고리
+          Text(
+            store.category!,
+            style: const TextStyle(color: primaryColor),
+          ),
+          const SizedBox(height: 5),
           // 매장명
           Text(
             store.name!,
@@ -249,35 +226,23 @@ class DetailsPage extends GetView<DetailsController> {
             ),
           ),
           const SizedBox(height: 15),
-          Obx(
-            () => RichText(
-              text: TextSpan(
-                children: [
-                  // 영업상태
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: StateRoundBox(
-                      state: controller.state.value,
-                      tableCount: controller.tableCount.value,
-                    ),
+          RichText(
+            text: TextSpan(
+              children: [
+                // 업데이트 시간
+                const WidgetSpan(
+                  child: Icon(
+                    Icons.update,
+                    color: Colors.black54,
+                    size: 18,
                   ),
-                  // 업데이트 시간
-                  const WidgetSpan(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 10, right: 5),
-                      child: Icon(
-                        Icons.update,
-                        color: Colors.black54,
-                        size: 17,
-                      ),
-                    ),
-                  ),
-                  TextSpan(
-                    text: '업데이트 ${controller.updated.value}',
-                    style: const TextStyle(color: Colors.black54),
-                  )
-                ],
-              ),
+                ),
+                TextSpan(
+                  text:
+                      ' 업데이트 ${Jiffy(controller.updated.value).fromNow()} (${controller.updated.value.substring(5, 16).replaceAll('T', ' ').replaceAll('-', '.')})',
+                  style: const TextStyle(fontSize: 15, color: Colors.black54),
+                )
+              ],
             ),
           ),
           const SizedBox(height: 25),
@@ -289,15 +254,48 @@ class DetailsPage extends GetView<DetailsController> {
   }
 
   Widget _buildIconButtons(store) {
+    String state = controller.state.value;
+    int tableCount = controller.tableCount.value;
+    String icon = 'stop';
+    Color color = darkNavy2;
+
+    // 색상 지정
+    if (state == '영업중') {
+      icon = 'play';
+      if (tableCount >= 4 || tableCount == -1) {
+        color = green;
+      } else if (tableCount >= 2) {
+        color = yellow;
+      } else {
+        color = red;
+      }
+    } else if (state == '휴게시간') {
+      icon = 'pause';
+      color = primaryColor;
+    }
+
+    // 영업상태 지정
+    if (state == '영업중') {
+      if (tableCount != -1) {
+        if (tableCount > 5) {
+          state = '5+ 테이블';
+        } else {
+          state = '$tableCount 테이블';
+        }
+      }
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // 영업상태
+        _buildIconButtonItem(icon, state, color, null),
         // 전화
-        _buildIconButtonItem(Icons.phone_rounded, '전화', () {
+        _buildIconButtonItem('phone', '전화', color, () {
           controller.launchPhoneUrl();
         }),
         // 위치
-        _buildIconButtonItem(Icons.location_on, '위치', () {
+        _buildIconButtonItem('location', '위치', color, () {
           Get.toNamed(Routes.naverMap, arguments: [
             store.name!,
             store.address!,
@@ -306,7 +304,7 @@ class DetailsPage extends GetView<DetailsController> {
           ]);
         }),
         // 공유
-        _buildIconButtonItem(Icons.share, '공유', () {
+        _buildIconButtonItem('share', '공유', color, () {
           Share.share(
               '\'' + controller.store.value.name! + '\'의 실시간 영업정보를 확인해보세요!');
           // *** 앱 연결 링크 추가 ***
@@ -315,25 +313,26 @@ class DetailsPage extends GetView<DetailsController> {
     );
   }
 
-  Widget _buildIconButtonItem(IconData icon, String label, dynamic tapFunc) {
+  Widget _buildIconButtonItem(
+      String icon, String label, Color color, dynamic tapFunc) {
     return SizedBox(
       width: 80,
       child: Column(
         children: [
           InkWell(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(20),
             child: Container(
               width: 50,
               height: 50,
+              padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: blueGrey, width: 1),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.black12),
               ),
               child: Center(
-                child: Icon(
-                  icon,
-                  color: Colors.blueGrey,
-                  size: 25,
+                child: Image.asset(
+                  'assets/images/icons/$icon.png',
+                  color: tapFunc == null ? color : darkNavy2,
                 ),
               ),
             ),
@@ -348,7 +347,7 @@ class DetailsPage extends GetView<DetailsController> {
 
   Widget _buildSubInfoBox(context, Store store) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+      padding: const EdgeInsets.fromLTRB(15, 20, 15, 15),
       child: Column(
         children: [
           // 오늘의 영업정보
@@ -365,9 +364,6 @@ class DetailsPage extends GetView<DetailsController> {
           // 매장내부사진
           _buildInsideImageList(
               store.insideImageUrlList!, store.allTableCount!),
-          // 블로그 리뷰 목록
-          if (store.blogList!.isNotEmpty)
-            NaverBlogList(blogList: store.blogList!),
         ],
       ),
     );
@@ -382,15 +378,17 @@ class DetailsPage extends GetView<DetailsController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              '오늘의 영업정보',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              '오늘의 영업시간',
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
             ),
             InkWell(
               child: const Text(
                 '전체보기',
                 style: TextStyle(color: primaryColor),
               ),
-              onTap: () {
+              onTap: () async {
+                // 영업시간 전체조회 (비동기 조회)
+                controller.findHours(storeId);
                 // 전체 영업정보 BottomSheet
                 showModalBottomSheet(
                   backgroundColor: Colors.transparent,
@@ -404,27 +402,24 @@ class DetailsPage extends GetView<DetailsController> {
           ],
         ),
         const SizedBox(height: 15),
-        // 오늘의 영업정보
-        Obx(
-          () => controller.businessHours.value != '없음'
-              ? Column(
-                  children: [
-                    TimeRowText(
-                        title: '영업시간', info: controller.businessHours.value),
-                    const SizedBox(height: 10),
-                    TimeRowText(
-                        title: '휴게시간', info: controller.breakTime.value),
-                    if (controller.lastOrder.value != '없음')
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: TimeRowText(
-                            title: '주문마감', info: controller.lastOrder.value),
-                      ),
-                  ],
-                )
-              : TimeRowText(
-                  title: '영업시간', info: '오늘은 ${controller.state.value}입니다.'),
-        ),
+        // 오늘의 영업시간
+        controller.businessHours.value != '없음'
+            ? Column(
+                children: [
+                  TimeRowText(
+                      title: '영업시간', info: controller.businessHours.value),
+                  const SizedBox(height: 10),
+                  TimeRowText(title: '휴게시간', info: controller.breakTime.value),
+                  if (controller.lastOrder.value != '없음')
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: TimeRowText(
+                          title: '주문마감', info: controller.lastOrder.value),
+                    ),
+                ],
+              )
+            : TimeRowText(
+                title: '영업시간', info: '오늘은 ${controller.state.value}입니다.'),
       ],
     );
   }
@@ -436,13 +431,13 @@ class DetailsPage extends GetView<DetailsController> {
         // 소개 헤더
         const Text(
           '소개',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
         ),
         const SizedBox(width: double.infinity, height: 15),
         // 소개 내용
         Text(
           description,
-          style: const TextStyle(fontSize: 15),
+          style: const TextStyle(fontSize: 16),
         ),
       ],
     );
@@ -455,7 +450,7 @@ class DetailsPage extends GetView<DetailsController> {
         // 웹사이트 헤더
         const Text(
           '웹사이트',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 15),
         // 웹사이트 링크
@@ -475,7 +470,7 @@ class DetailsPage extends GetView<DetailsController> {
                 ),
                 TextSpan(
                   text: website,
-                  style: const TextStyle(fontSize: 15, color: primaryColor),
+                  style: const TextStyle(fontSize: 16, color: primaryColor),
                 )
               ],
             ),
@@ -501,7 +496,7 @@ class DetailsPage extends GetView<DetailsController> {
               children: [
                 const Text(
                   '메뉴판사진',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 5),
                 Text(
@@ -536,7 +531,7 @@ class DetailsPage extends GetView<DetailsController> {
               children: [
                 const Text(
                   '매장내부사진',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 5),
                 Text(
@@ -561,13 +556,12 @@ class DetailsPage extends GetView<DetailsController> {
   Widget _buildGuideText(context) {
     return Container(
       width: double.infinity,
-      height: 150,
       color: lightGrey,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(height: 30),
           const Text(
-            'ⓘ 해당 정보는 매장 상황에 따라 달라질 수 있습니다.',
+            'ⓘ 해당 정보는 매장 상황에 따라 실제와 다를 수 있습니다.',
             style: TextStyle(color: Colors.black54),
           ),
           const SizedBox(height: 20),
@@ -603,6 +597,7 @@ class DetailsPage extends GetView<DetailsController> {
               },
             ),
           ),
+          const SizedBox(height: 50),
         ],
       ),
     );
@@ -699,7 +694,7 @@ class DetailsPage extends GetView<DetailsController> {
           Icon(
             controller.infoItemIcons[index],
             size: 20,
-            color: Colors.blueGrey,
+            color: primaryColor,
           ),
           const SizedBox(width: 10),
           Text(controller.infoItems[index]),

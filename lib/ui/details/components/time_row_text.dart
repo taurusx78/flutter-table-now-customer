@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:table_now/ui/custom_color.dart';
 
@@ -13,23 +14,32 @@ class TimeRowText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 15, color: Colors.black54),
-        ),
-        Container(
-          width: 1,
-          height: 15,
-          color: blueGrey,
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-        ),
-        Text(
-          info,
-          style: const TextStyle(fontSize: 15),
-        ),
-      ],
+    return RichText(
+      text: TextSpan(
+        text: title,
+        style: TextStyle(
+            fontSize: 16, color: title != '정기휴무' ? Colors.black54 : red),
+        children: [
+          WidgetSpan(
+            child: Container(
+              width: 1,
+              height: 15,
+              color: blueGrey,
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+            ),
+          ),
+          WidgetSpan(
+            alignment: PlaceholderAlignment.top,
+            child: SizedBox(
+              width: 200,
+              child: Text(
+                info,
+                style: const TextStyle(fontSize: 16, color: Colors.black),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

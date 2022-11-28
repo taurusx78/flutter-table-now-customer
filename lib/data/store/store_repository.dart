@@ -1,8 +1,9 @@
 import 'package:get/get.dart';
-import 'package:table_now/controller/dto/store_resp.dart';
 import 'package:table_now/controller/dto/code_msg_resp.dart';
-import 'package:table_now/controller/dto/store_name_resp.dart';
+import 'package:table_now/controller/dto/hours_resp.dart';
 import 'package:table_now/controller/dto/state_resp.dart';
+import 'package:table_now/controller/dto/store_name_resp.dart';
+import 'package:table_now/controller/dto/store_resp.dart';
 import 'package:table_now/data/store/store_provider.dart';
 import 'package:table_now/util/all_store_name.dart';
 
@@ -85,6 +86,8 @@ class StoreRepository {
     Response response = await _storeProvider.findById(storeId);
     CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
 
+    printData(codeMsgResp);
+
     if (codeMsgResp.code == 1) {
       return Store.fromJson(codeMsgResp.response);
     } else {
@@ -92,10 +95,24 @@ class StoreRepository {
     }
   }
 
+  // 영업시간 전체조회
+  Future<dynamic> findHours(int storeId) async {
+    Response response = await _storeProvider.findHours(storeId);
+    CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
+
+    if (codeMsgResp.code == 1) {
+      return HoursResp.fromJson(codeMsgResp.response);
+    } else {
+      return -1;
+    }
+  }
+
   // 영업상태 조회
   Future<dynamic> updateState(int storeId) async {
     Response response = await _storeProvider.updateState(storeId);
     CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
+
+    printData(codeMsgResp);
 
     if (codeMsgResp.code == 1) {
       return StateResp.fromJson(codeMsgResp.response);

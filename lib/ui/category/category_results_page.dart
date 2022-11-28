@@ -45,44 +45,47 @@ class CategoryResultsPage extends GetView<StoreController> {
           )
         ],
       ),
-      body: Container(
-        width: 600,
-        margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 현재위치 정보
-            LocationBar(tapFunc: () async {
-              String result =
-                  await Get.find<LocationController>().getCurrentLocation();
-              showToast(context, result);
-              // 현재위치를 기반으로 카테고리 매장 다시조회
-              controller.findAllByCategory(category);
-            }),
-            const SizedBox(height: 15),
-            // 필터 & 드롭다운
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                StateFilter(),
-                SortDropdown(),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // 검색결과 헤더
-            Obx(() => _buildResultsHeader()),
-            const SizedBox(height: 15),
-            // 검색매장 목록
-            Obx(
-              () => controller.isLoaded.value
-                  ? Expanded(
-                      child: controller.filteredStoreList.isNotEmpty
-                          ? _buildResultsStoreList()
-                          : _buildNoStoreBox(),
-                    )
-                  : const LoadingIndicator(height: 200),
-            ),
-          ],
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: 600,
+          margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 현재위치 정보
+              LocationBar(tapFunc: () async {
+                String result =
+                    await Get.find<LocationController>().getCurrentLocation();
+                showToast(context, result);
+                // 현재위치를 기반으로 카테고리 매장 다시조회
+                controller.findAllByCategory(category);
+              }),
+              const SizedBox(height: 15),
+              // 필터 & 드롭다운
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  StateFilter(),
+                  SortDropdown(),
+                ],
+              ),
+              const SizedBox(height: 20),
+              // 검색결과 헤더
+              Obx(() => _buildResultsHeader()),
+              const SizedBox(height: 15),
+              // 검색매장 목록
+              Obx(
+                () => controller.isLoaded.value
+                    ? Expanded(
+                        child: controller.filteredStoreList.isNotEmpty
+                            ? _buildResultsStoreList()
+                            : _buildNoStoreBox(),
+                      )
+                    : const LoadingIndicator(height: 200),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -15,18 +15,24 @@ class NaverBlogList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const CustomDivider(),
-        // 블로그 리뷰 헤더
-        const Text(
-          '블로그 리뷰',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CustomDivider(),
+              // 블로그 리뷰 헤더
+              const Text(
+                '블로그 리뷰',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 15),
+              // 블로그 리뷰 목록
+              _buildBlogList(),
+            ],
+          ),
         ),
-        const SizedBox(height: 15),
-        // 블로그 리뷰 목록
-        _buildBlogList(),
-        const SizedBox(height: 15),
         // 더보기 버튼
         _buildMoreButton(),
       ],
@@ -56,13 +62,14 @@ class NaverBlogList extends StatelessWidget {
                   RichText(
                     text: TextSpan(
                       children: [
-                        const WidgetSpan(
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
                           child: Padding(
-                            padding: EdgeInsets.only(right: 5),
-                            child: Icon(
-                              Icons.rate_review_outlined,
+                            padding: const EdgeInsets.only(right: 5),
+                            child: Image.asset(
+                              'assets/images/icons/edit_note.png',
                               color: primaryColor,
-                              size: 18,
+                              width: 28,
                             ),
                           ),
                         ),
@@ -121,21 +128,34 @@ class NaverBlogList extends StatelessWidget {
 
   Widget _buildMoreButton() {
     return InkWell(
-      borderRadius: BorderRadius.circular(5),
       child: Container(
-        height: 50,
+        height: 60,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
+          border: const Border(
+            top: BorderSide(color: blueGrey, width: 2),
+          ),
           gradient: LinearGradient(
             colors: [primaryColor.withOpacity(0.7), primaryColor],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
-        child: const Center(
-          child: Text(
-            '블로그 검색결과 더보기',
-            style: TextStyle(fontSize: 17, color: Colors.white),
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Text(
+                '블로그 검색결과 더보기',
+                style: TextStyle(fontSize: 17, color: Colors.white),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 3),
+                child: Icon(
+                  Icons.keyboard_arrow_right_rounded,
+                  color: Colors.white,
+                ),
+              )
+            ],
           ),
         ),
       ),

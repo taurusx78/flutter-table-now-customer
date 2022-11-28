@@ -80,7 +80,9 @@ class CategoryPage extends StatelessWidget {
               getScreenWidth(context) - 30 < 600 ? 4 : 5, // 행에 보여줄 item 개수
           mainAxisSpacing: 10, // item 수직 간격
           crossAxisSpacing: 10, // item 수평 간격
-          childAspectRatio: 1 / 1.2, // item 너비:높이 비율
+          childAspectRatio: getScreenWidth(context) - 30 < 600
+              ? 1 / 1.3
+              : 1 / 1, // item 너비:높이 비율
         ),
         itemBuilder: (context, index) {
           return CategoryItem(

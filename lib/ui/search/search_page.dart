@@ -30,43 +30,46 @@ class SearchPage extends GetView<SearchController> {
           title: _buildSearchTextField(context),
           toolbarHeight: 75,
         ),
-        body: Container(
-          width: 600,
-          margin: const EdgeInsets.fromLTRB(15, 5, 15, 15),
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  // 광고
-                  const KakaoBannerAd(),
-                  Obx(
-                    () => controller.history.isNotEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 5, vertical: 20),
-                            child: _buildHistoryHeader(context),
-                          )
-                        : const SizedBox(),
-                  ),
-                  // 최근검색어 목록
-                  Expanded(
-                    child: Obx(
+        body: Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            width: 600,
+            margin: const EdgeInsets.fromLTRB(15, 5, 15, 15),
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    // 광고
+                    const KakaoBannerAd(),
+                    Obx(
                       () => controller.history.isNotEmpty
-                          ? _buildHistoryList()
-                          : _buildNoHistoryBox(),
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 20),
+                              child: _buildHistoryHeader(context),
+                            )
+                          : const SizedBox(),
                     ),
-                  ),
-                ],
-              ),
-              // 연관검색어 매장 목록
-              Obx(
-                () => controller.isFilled.value
-                    ? Positioned(
-                        child: _buildRelatedStoreList(),
-                      )
-                    : const SizedBox(),
-              ),
-            ],
+                    // 최근검색어 목록
+                    Expanded(
+                      child: Obx(
+                        () => controller.history.isNotEmpty
+                            ? _buildHistoryList()
+                            : _buildNoHistoryBox(),
+                      ),
+                    ),
+                  ],
+                ),
+                // 연관검색어 매장 목록
+                Obx(
+                  () => controller.isFilled.value
+                      ? Positioned(
+                          child: _buildRelatedStoreList(),
+                        )
+                      : const SizedBox(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -75,65 +78,68 @@ class SearchPage extends GetView<SearchController> {
 
   // *** 최대 길이 지정!
   Widget _buildSearchTextField(context) {
-    return TextField(
-      controller: controller.search,
-      focusNode: _focusNode,
-      autofocus: true,
-      style: const TextStyle(fontSize: 16),
-      decoration: InputDecoration(
-        hintText: '지역 + 매장명을 입력해 주세요.',
-        hintStyle: const TextStyle(fontSize: 16, color: Colors.black54),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
+    return SizedBox(
+      width: 600,
+      child: TextField(
+        controller: controller.search,
+        focusNode: _focusNode,
+        autofocus: true,
+        style: const TextStyle(fontSize: 16),
+        decoration: InputDecoration(
+          hintText: '지역 + 매장명을 입력해 주세요.',
+          hintStyle: const TextStyle(fontSize: 16, color: Colors.black54),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: primaryColor, width: 2),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: primaryColor, width: 2),
+          ),
+          // 입력값 길어질 때 텍스트 가리지 않도록 설정
+          isDense: true,
+          prefixIcon: IconButton(
+            splashRadius: 20,
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+          suffixIcon: IconButton(
+            splashRadius: 20,
+            icon: const Icon(Icons.clear_rounded, color: Colors.black54),
+            onPressed: () {
+              controller.search.clear();
+            },
+          ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
-        ),
-        // 입력값 길어질 때 텍스트 가리지 않도록 설정
-        isDense: true,
-        prefixIcon: IconButton(
-          splashRadius: 20,
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () {
-            Get.back();
-          },
-        ),
-        suffixIcon: IconButton(
-          splashRadius: 20,
-          icon: const Icon(Icons.clear_rounded, color: Colors.black54),
-          onPressed: () {
-            controller.search.clear();
-          },
-        ),
-      ),
-      onChanged: (value) {
-        // 연관검색어 매장 목록 변경
-        controller.changeRelatedStoreList(value);
-      },
-      onSubmitted: (value) async {
-        value = value.trim(); // 공백 제거
-        if (value.isNotEmpty) {
-          // 검색매장 전체조회 (비동기 호출)
-          _storeController.findAllByName(value);
-          // 연관검색어 매장 목록 초기화
-          controller.initializeRelatedStoreList();
-          // 검색 필터 & 정렬 선택항목 초기화
-          _storeController.initializeFilterSort();
-          // 검색결과 페이지로 이동
-          Get.toNamed(Routes.searchResults, arguments: value)!.then((value) {
+        onChanged: (value) {
+          // 연관검색어 매장 목록 변경
+          controller.changeRelatedStoreList(value);
+        },
+        onSubmitted: (value) async {
+          value = value.trim(); // 공백 제거
+          if (value.isNotEmpty) {
+            // 검색매장 전체조회 (비동기 호출)
+            _storeController.findAllByName(value);
+            // 연관검색어 매장 목록 초기화
+            controller.initializeRelatedStoreList();
+            // 검색 필터 & 정렬 선택항목 초기화
+            _storeController.initializeFilterSort();
+            // 검색결과 페이지로 이동
+            Get.toNamed(Routes.searchResults, arguments: value)!.then((value) {
+              _focusNode.requestFocus(); // TextField 포커스 유지
+              controller.search.clear();
+            });
+            // 최근검색어 추가
+            await controller.addHistory(value, false);
+          } else {
             _focusNode.requestFocus(); // TextField 포커스 유지
             controller.search.clear();
-          });
-          // 최근검색어 추가
-          await controller.addHistory(value, false);
-        } else {
-          _focusNode.requestFocus(); // TextField 포커스 유지
-          controller.search.clear();
-          showToast(context, '검색어를 입력해 주세요.');
-        }
-      },
+            showToast(context, '검색어를 입력해 주세요.');
+          }
+        },
+      ),
     );
   }
 
@@ -212,7 +218,9 @@ class SearchPage extends GetView<SearchController> {
             color: Colors.white,
             child: InkWell(
               child: Container(
-                width: getScreenWidth(context) - 80,
+                width: getScreenWidth(context) - 30 < 600
+                    ? getScreenWidth(context) - 80
+                    : 550,
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: Align(

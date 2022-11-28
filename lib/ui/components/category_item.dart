@@ -22,7 +22,6 @@ class CategoryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // 이미지
           Container(
@@ -40,6 +39,7 @@ class CategoryItem extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 5),
           // 라벨
           Text(
             label,
