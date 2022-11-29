@@ -34,12 +34,14 @@ class DetailsController extends GetxController {
   final RxInt curNoticeImageIndex = 0.obs;
 
   // 정보수정제안 항목 체크 여부
-  List<String> infoItems = ['영업시간 정보', '메뉴/가격 정보'];
+  List<String> infoItems = ['영업시간', '메뉴/가격', '매장내부사진', '매장 폐업'];
   List<IconData> infoItemIcons = [
     Icons.access_time_rounded,
-    Icons.book_outlined
+    Icons.book_outlined,
+    Icons.storefront_outlined,
+    Icons.wrong_location_outlined,
   ];
-  List<RxBool> itemIsChecked = [false.obs, false.obs];
+  List<RxBool> itemIsChecked = [false.obs, false.obs, false.obs, false.obs];
 
   // 스크롤에 따라 앱바 텍스트 색상 변경
   final ScrollController scrollController = ScrollController();
@@ -120,7 +122,6 @@ class DetailsController extends GetxController {
   // 영업시간 전체조회
   Future<void> findHours(int storeId) async {
     isHoursLoaded.value = false;
-    await Future.delayed(Duration(seconds: 2));
     weeklyHours.value = await _storeRepository.findHours(storeId);
     isHoursLoaded.value = true;
   }
@@ -201,7 +202,7 @@ class DetailsController extends GetxController {
 
   // 정보수정요청 항목 체크 여부 초기화
   void initializeItemIsChecked() {
-    itemIsChecked = [false.obs, false.obs];
+    itemIsChecked = [false.obs, false.obs, false.obs, false.obs];
   }
 
   // 정보수정요청 항목 체크 여부 변경

@@ -21,7 +21,11 @@ class NaverBlogList extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CustomDivider(),
+              Container(
+                height: 1,
+                color: blueGrey,
+                margin: const EdgeInsets.only(bottom: 20),
+              ),
               // 블로그 리뷰 헤더
               const Text(
                 '블로그 리뷰',

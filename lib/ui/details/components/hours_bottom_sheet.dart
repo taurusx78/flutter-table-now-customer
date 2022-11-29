@@ -30,7 +30,7 @@ class HoursBottomSheet extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 15),
             child: Text(
-              '영업정보',
+              '영업시간',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -42,7 +42,7 @@ class HoursBottomSheet extends StatelessWidget {
             () {
               if (controller.isHoursLoaded.value) {
                 var weeklyHours = controller.weeklyHours.value.weeklyHours!;
-                print(weeklyHours);
+                double width = getScreenWidth(context) - 150;
                 return Expanded(
                   child: ListView.separated(
                     itemCount: 7,
@@ -53,6 +53,7 @@ class HoursBottomSheet extends StatelessWidget {
                         weeklyHours[index][1],
                         weeklyHours[index][2],
                         weeklyHours[index][3],
+                        width,
                       );
                     },
                     separatorBuilder: (context, index) => Container(
@@ -72,7 +73,7 @@ class HoursBottomSheet extends StatelessWidget {
   }
 
   Widget _buildHoursInfo(String day, String businessHours, String breakTime,
-      String lastOrder, String holidayWeek) {
+      String lastOrder, String holidayWeek, double width) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 15, 20, 20),
       child: Column(
@@ -101,7 +102,10 @@ class HoursBottomSheet extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: TimeRowText(
-                            title: '정기휴무', info: '매달 $holidayWeek $day요일'),
+                          title: '정기휴무',
+                          info: '매월 $holidayWeek $day요일',
+                          width: width,
+                        ),
                       ),
                   ],
                 )

@@ -86,8 +86,6 @@ class StoreRepository {
     Response response = await _storeProvider.findById(storeId);
     CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
 
-    printData(codeMsgResp);
-
     if (codeMsgResp.code == 1) {
       return Store.fromJson(codeMsgResp.response);
     } else {
@@ -111,8 +109,6 @@ class StoreRepository {
   Future<dynamic> updateState(int storeId) async {
     Response response = await _storeProvider.updateState(storeId);
     CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
-
-    printData(codeMsgResp);
 
     if (codeMsgResp.code == 1) {
       return StateResp.fromJson(codeMsgResp.response);

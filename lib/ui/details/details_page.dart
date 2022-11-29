@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:share/share.dart';
 import 'package:table_now/controller/details_controller.dart';
-import 'package:table_now/controller/dto/hours_resp.dart';
 import 'package:table_now/data/store/model/store.dart';
 import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/dialog_ui.dart';
@@ -228,19 +227,23 @@ class DetailsPage extends GetView<DetailsController> {
           const SizedBox(height: 15),
           RichText(
             text: TextSpan(
+              style: const TextStyle(fontSize: 15, color: darkNavy),
               children: [
                 // 업데이트 시간
                 const WidgetSpan(
                   child: Icon(
                     Icons.update,
-                    color: Colors.black54,
+                    color: darkNavy,
                     size: 18,
                   ),
                 ),
                 TextSpan(
+                  text: ' 업데이트 ${Jiffy(controller.updated.value).fromNow()}',
+                ),
+                TextSpan(
                   text:
-                      ' 업데이트 ${Jiffy(controller.updated.value).fromNow()} (${controller.updated.value.substring(5, 16).replaceAll('T', ' ').replaceAll('-', '.')})',
-                  style: const TextStyle(fontSize: 15, color: Colors.black54),
+                      ' (${controller.updated.value.substring(5, 16).replaceAll('T', ' ').replaceAll('-', '.')})',
+                  style: const TextStyle(color: Colors.black54),
                 )
               ],
             ),
@@ -347,7 +350,7 @@ class DetailsPage extends GetView<DetailsController> {
 
   Widget _buildSubInfoBox(context, Store store) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(15, 20, 15, 15),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
       child: Column(
         children: [
           // 오늘의 영업정보
@@ -405,6 +408,7 @@ class DetailsPage extends GetView<DetailsController> {
         // 오늘의 영업시간
         controller.businessHours.value != '없음'
             ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TimeRowText(
                       title: '영업시간', info: controller.businessHours.value),
@@ -463,7 +467,7 @@ class DetailsPage extends GetView<DetailsController> {
                     padding: EdgeInsets.only(right: 5),
                     child: Icon(
                       Icons.language_rounded,
-                      size: 15,
+                      size: 17,
                       color: Colors.blueGrey,
                     ),
                   ),
@@ -607,7 +611,7 @@ class DetailsPage extends GetView<DetailsController> {
     showDialog(
       context: context,
       barrierDismissible: false, // Dialog 밖의 화면 터치 못하도록 설정
-      builder: (context) {
+      builder: (context2) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(5),
@@ -659,7 +663,7 @@ class DetailsPage extends GetView<DetailsController> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context); // alertDialog 닫기
+                    Navigator.pop(context2); // alertDialog 닫기
                   },
                 ),
                 TextButton(
@@ -672,10 +676,10 @@ class DetailsPage extends GetView<DetailsController> {
                   ),
                   onPressed: () {
                     if (controller.atLeastOneIsChecked()) {
-                      Navigator.pop(context); // alertDialog 닫기
+                      Navigator.pop(context2); // alertDialog 닫기
                       _showSendMailDialog(context);
                     } else {
-                      showToast(context, '항목을 최소 하나 선택해주세요.');
+                      showToast(context2, '항목을 최소 하나 선택해주세요.');
                     }
                   },
                 ),
@@ -694,7 +698,7 @@ class DetailsPage extends GetView<DetailsController> {
           Icon(
             controller.infoItemIcons[index],
             size: 20,
-            color: primaryColor,
+            color: darkNavy2,
           ),
           const SizedBox(width: 10),
           Text(controller.infoItems[index]),
@@ -714,7 +718,7 @@ class DetailsPage extends GetView<DetailsController> {
       barrierDismissible: false, // Dialog 밖의 화면 터치 못하도록 설정
       builder: (BuildContext context2) {
         return DialogUI(
-          content: '[${controller.store.value.name!}]에 정보수정 제안 메일을 전송하시겠습니까?',
+          content: '매장 정보 수정을 제안하는 메일을 전송하시겠습니까?',
           checkFunc: () async {
             Navigator.pop(context2); // alertDialog 닫기
             // 매장정보 수정제안
