@@ -76,11 +76,11 @@ class SearchPage extends GetView<SearchController> {
     );
   }
 
-  // *** 최대 길이 지정!
   Widget _buildSearchTextField(context) {
     return SizedBox(
       width: 600,
       child: TextField(
+        maxLength: 50, // 최대 길이 제한
         controller: controller.search,
         focusNode: _focusNode,
         autofocus: true,
