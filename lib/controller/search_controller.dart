@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:table_now/controller/dto/store_name_resp.dart';
+import 'package:table_now/controller/dto/store_name_resp_dto.dart';
 import 'package:table_now/data/store/store_repository.dart';
 import 'package:table_now/util/all_store_name.dart';
 
@@ -11,7 +11,7 @@ class SearchController extends GetxController {
   final RxList<String> history = <String>[].obs; // 최근검색어 목록
 
   final search = TextEditingController();
-  final RxList relatedStoreList = <StoreNameResp>[].obs; // 연관검색어 매장 목록
+  final RxList relatedStoreList = <StoreNameRespDto>[].obs; // 연관검색어 매장 목록
   final RxBool isFilled = false.obs; // 텍스트필드 입력 여부
 
   @override
@@ -82,8 +82,8 @@ class SearchController extends GetxController {
 
   // 연관검색어 매장 목록 변경
   void changeRelatedStoreList(String value) {
-    List<StoreNameResp> temp = [];
-    for (StoreNameResp storeName in allStoreName!) {
+    List<StoreNameRespDto> temp = [];
+    for (StoreNameRespDto storeName in allStoreName!) {
       if (storeName.name.contains(value)) {
         temp.add(storeName);
       }
@@ -95,7 +95,7 @@ class SearchController extends GetxController {
 
   // 연관검색어 매장 목록 초기화
   void initializeRelatedStoreList() {
-    relatedStoreList.value = <StoreNameResp>[];
+    relatedStoreList.value = <StoreNameRespDto>[];
   }
 
   // 텍스트필드 입력 유무

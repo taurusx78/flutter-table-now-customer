@@ -12,6 +12,7 @@ import 'package:table_now/ui/components/sort_dropdown.dart';
 import 'package:table_now/ui/components/state_filter.dart';
 import 'package:table_now/ui/components/store_item.dart';
 import 'package:table_now/ui/custom_color.dart';
+import 'package:table_now/ui/details/components/info_row_text.dart';
 
 class SearchResultsPage extends GetView<SearchController> {
   SearchResultsPage({Key? key}) : super(key: key);
@@ -212,24 +213,11 @@ class SearchResultsPage extends GetView<SearchController> {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         if (_storeController.curFilterIndex.value == 1)
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: RichText(
-              text: const TextSpan(
-                children: [
-                  WidgetSpan(
-                    child: Icon(
-                      Icons.info_outline_rounded,
-                      color: primaryColor,
-                      size: 18,
-                    ),
-                  ),
-                  TextSpan(
-                    text: ' 잔여테이블 정보를 제공하지 않는 매장은 제외됩니다.',
-                    style: TextStyle(color: Colors.black54),
-                  )
-                ],
-              ),
+          const Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: InfoRowText(
+              text: '잔여테이블 정보를 제공하지 않는 매장은 제외됩니다.',
+              margin: 30,
             ),
           ),
       ],

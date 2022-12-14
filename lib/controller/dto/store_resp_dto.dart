@@ -1,6 +1,6 @@
 // 서버로부터 응답받은 매장 전체정보 데이터를 담을 DTO
 
-class StoreResp {
+class StoreRespDto {
   final int id; // 매장 id
   final String name; // 매장명
   final String jibunAddress; // 지번주소
@@ -10,7 +10,7 @@ class StoreResp {
   final String updated; // 업데이트 시간
   final double distance; // 현재위치와의 거리
 
-  StoreResp({
+  StoreRespDto({
     required this.id,
     required this.name,
     required this.jibunAddress,
@@ -22,7 +22,7 @@ class StoreResp {
   });
 
   // JSON 데이터를 Dart 오브젝트로 변경
-  StoreResp.fromJson(Map<String, dynamic> json)
+  StoreRespDto.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         name = json['name'],
         jibunAddress = json['jibunAddress'],

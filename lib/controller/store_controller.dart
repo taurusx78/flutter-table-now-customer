@@ -1,13 +1,14 @@
 import 'package:get/get.dart';
-import 'package:table_now/controller/dto/store_resp.dart';
+import 'package:table_now/controller/dto/store_resp_dto.dart';
 import 'package:table_now/controller/location_controller.dart';
 import 'package:table_now/data/store/store_repository.dart';
 
 class StoreController extends GetxController {
   final StoreRepository _storeRepository = StoreRepository();
   final LocationController _locationController = Get.put(LocationController());
-  final RxList<StoreResp> allStoreList = <StoreResp>[].obs; // 전체매장 목록
-  final RxList<StoreResp> filteredStoreList = <StoreResp>[].obs; // 필터 적용 매장 목록
+  final RxList<StoreRespDto> allStoreList = <StoreRespDto>[].obs; // 전체매장 목록
+  final RxList<StoreRespDto> filteredStoreList =
+      <StoreRespDto>[].obs; // 필터 적용 매장 목록
   final RxBool isLoaded = true.obs; // 매장 조회 완료 여부
 
   // 영업상태 필터

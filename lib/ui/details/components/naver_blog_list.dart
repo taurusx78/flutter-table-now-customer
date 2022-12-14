@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:table_now/controller/details_controller.dart';
 import 'package:table_now/data/store/model/blog.dart';
 import 'package:table_now/ui/custom_color.dart';
-import 'package:table_now/ui/details/components/custom_divider.dart';
 
 class NaverBlogList extends StatelessWidget {
   final List<Blog> blogList;

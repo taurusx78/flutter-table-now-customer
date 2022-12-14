@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:table_now/controller/details_controller.dart';
-import 'package:table_now/controller/dto/store_resp.dart';
+import 'package:table_now/controller/dto/store_resp_dto.dart';
 import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/state_round_box.dart';
 import 'package:table_now/ui/custom_color.dart';
@@ -10,7 +10,7 @@ import 'package:table_now/ui/screen_size.dart';
 import 'package:table_now/util/host.dart';
 
 class StoreItem extends StatelessWidget {
-  final StoreResp store;
+  final StoreRespDto store;
   final bool isBookmark;
 
   const StoreItem({

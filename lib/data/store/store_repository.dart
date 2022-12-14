@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import 'package:table_now/controller/dto/code_msg_resp.dart';
-import 'package:table_now/controller/dto/hours_resp.dart';
-import 'package:table_now/controller/dto/state_resp.dart';
-import 'package:table_now/controller/dto/store_name_resp.dart';
-import 'package:table_now/controller/dto/store_resp.dart';
+import 'package:table_now/controller/dto/code_msg_resp_dto.dart';
+import 'package:table_now/controller/dto/hours_resp_dto.dart';
+import 'package:table_now/controller/dto/state_resp_dto.dart';
+import 'package:table_now/controller/dto/store_name_resp_dto.dart';
+import 'package:table_now/controller/dto/store_resp_dto.dart';
 import 'package:table_now/data/store/store_provider.dart';
 import 'package:table_now/util/all_store_name.dart';
 
@@ -14,92 +14,86 @@ import 'model/store.dart';
 class StoreRepository {
   final StoreProvider _storeProvider = StoreProvider();
 
-  void printData(codeMsgResp) {
-    print(codeMsgResp.code);
-    print(codeMsgResp.message);
-    print(codeMsgResp.response);
-  }
-
   // 매장명 전체조회
   Future<void> findAllStoreName() async {
     Response response = await _storeProvider.findAllStoreName();
-    CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
+    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
 
-    if (codeMsgResp.code == 1) {
-      List<dynamic> temp = codeMsgResp.response;
-      allStoreName = temp.map((e) => StoreNameResp.fromJson(e)).toList();
+    if (dto.code == 1) {
+      List<dynamic> temp = dto.response;
+      allStoreName = temp.map((e) => StoreNameRespDto.fromJson(e)).toList();
       storeNameUpdated = DateTime.now();
     }
   }
 
   // 즐겨찾기 전체조회
-  Future<List<StoreResp>> findAllBookmark(String storeIds) async {
+  Future<List<StoreRespDto>> findAllBookmark(String storeIds) async {
     Response response = await _storeProvider.findAllBookmark(storeIds);
-    CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
+    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
 
-    if (codeMsgResp.code == 1) {
-      List<dynamic> temp = codeMsgResp.response;
-      List<StoreResp> storeList =
-          temp.map((store) => StoreResp.fromJson(store)).toList();
+    if (dto.code == 1) {
+      List<dynamic> temp = dto.response;
+      List<StoreRespDto> storeList =
+          temp.map((store) => StoreRespDto.fromJson(store)).toList();
       return storeList;
     } else {
-      return <StoreResp>[]; // StoreResp 타입의 빈 배열 반환
+      return <StoreRespDto>[]; // StoreResp 타입의 빈 배열 반환
     }
   }
 
   // 검색매장 전체조회
-  Future<List<StoreResp>> findAllByName(
+  Future<List<StoreRespDto>> findAllByName(
       String name, double latitude, double longitude) async {
     Response response =
         await _storeProvider.findAllByName(name, latitude, longitude);
-    CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
+    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
 
-    if (codeMsgResp.code == 1) {
-      List<dynamic> temp = codeMsgResp.response;
-      List<StoreResp> storeList =
-          temp.map((store) => StoreResp.fromJson(store)).toList();
+    if (dto.code == 1) {
+      List<dynamic> temp = dto.response;
+      List<StoreRespDto> storeList =
+          temp.map((store) => StoreRespDto.fromJson(store)).toList();
       return storeList;
     } else {
-      return <StoreResp>[]; // StoreResp 타입의 빈 배열 반환
+      return <StoreRespDto>[]; // StoreResp 타입의 빈 배열 반환
     }
   }
 
   // 카테고리 매장 전체조회
-  Future<List<StoreResp>> findAllByCategory(
+  Future<List<StoreRespDto>> findAllByCategory(
       String category, double latitude, double longitude) async {
     Response response =
         await _storeProvider.findAllByCategory(category, latitude, longitude);
-    CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
+    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
 
-    if (codeMsgResp.code == 1) {
-      List<dynamic> temp = codeMsgResp.response;
-      List<StoreResp> storeList =
-          temp.map((store) => StoreResp.fromJson(store)).toList();
+    if (dto.code == 1) {
+      List<dynamic> temp = dto.response;
+      List<StoreRespDto> storeList =
+          temp.map((store) => StoreRespDto.fromJson(store)).toList();
       return storeList;
     } else {
-      return <StoreResp>[]; // StoreResp 타입의 빈 배열 반환
+      return <StoreRespDto>[]; // StoreResp 타입의 빈 배열 반환
     }
   }
 
   // 매장 상세조회
-  Future<Store> findById(int storeId) async {
+  Future<dynamic> findById(int storeId) async {
     Response response = await _storeProvider.findById(storeId);
-    CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
+    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
 
-    if (codeMsgResp.code == 1) {
-      return Store.fromJson(codeMsgResp.response);
+    if (dto.code == 1) {
+      return Store.fromJson(dto.response);
     } else {
-      return Store();
+      return null;
     }
   }
 
   // 영업시간 전체조회
   Future<dynamic> findHours(int storeId) async {
     Response response = await _storeProvider.findHours(storeId);
-    CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
+    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
 
-    if (codeMsgResp.code == 1) {
-      return HoursResp.fromJson(codeMsgResp.response);
+    if (dto.code == 1) {
+      return HoursRespDto.fromJson(dto.response);
     } else {
       return -1;
     }
@@ -108,10 +102,10 @@ class StoreRepository {
   // 영업상태 조회
   Future<dynamic> updateState(int storeId) async {
     Response response = await _storeProvider.updateState(storeId);
-    CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
+    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
 
-    if (codeMsgResp.code == 1) {
-      return StateResp.fromJson(codeMsgResp.response);
+    if (dto.code == 1) {
+      return StateRespDto.fromJson(dto.response);
     } else {
       return -1;
     }
@@ -120,7 +114,7 @@ class StoreRepository {
   // 매장정보 수정제안
   Future<int> requestUpdate(int storeId, Map data) async {
     Response response = await _storeProvider.requestUpdate(storeId, data);
-    CodeMsgResp codeMsgResp = CodeMsgResp.fromJson(response.body);
-    return codeMsgResp.code;
+    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
+    return dto.code;
   }
 }

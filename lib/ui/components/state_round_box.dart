@@ -4,7 +4,7 @@ import 'package:table_now/ui/custom_color.dart';
 class StateRoundBox extends StatelessWidget {
   String state;
   final int tableCount;
-  Color color = Colors.black38;
+  Color color = Colors.black54;
 
   StateRoundBox({
     Key? key,

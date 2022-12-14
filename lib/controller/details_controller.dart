@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:table_now/controller/dto/state_resp.dart';
+import 'package:table_now/controller/dto/state_resp_dto.dart';
 import 'package:table_now/data/store/model/store.dart';
 import 'package:table_now/data/store/store_repository.dart';
 import 'package:table_now/data/sqlite_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'dto/hours_resp.dart';
+import 'dto/hours_resp_dto.dart';
 
 class DetailsController extends GetxController {
   final StoreRepository _storeRepository = StoreRepository();
-  final Rx<Store> store = Store().obs;
+  final store = Rxn<Store>();
   final RxString state = ''.obs; // 영업상태
   final RxInt tableCount = 0.obs; // 잔여테이블 수
   final RxString updated = ''.obs; // 업데이트 시간
@@ -21,7 +21,7 @@ class DetailsController extends GetxController {
   final RxBool isLoaded = true.obs; // 상세보기 조회 완료 여부
   final RxBool isBookmarked = false.obs; // 즐겨찾기 포함 여부
 
-  final Rx<HoursResp> weeklyHours = HoursResp().obs; // 전체 영업시간
+  final weeklyHours = Rxn<HoursRespDto>(); // 전체 영업시간
   final RxBool isHoursLoaded = true.obs; // 전체 영업시간 조회 완료 여부
 
   // 대표사진 현재 인덱스
@@ -75,17 +75,18 @@ class DetailsController extends GetxController {
   // 매장 상세조회
   Future<void> findById(int storeId) async {
     isLoaded.value = false;
-
     store.value = await _storeRepository.findById(storeId);
     // 즐겨찾기 포함 여부 조회
     await checkIsBookmarked(storeId);
-    state.value = store.value.state!;
-    tableCount.value = store.value.tableCount!;
-    updated.value = store.value.updated!;
-    businessHours.value = store.value.businessHours!;
-    breakTime.value = store.value.breakTime!;
-    lastOrder.value = store.value.lastOrder!;
-
+    state.value = store.value!.state;
+    tableCount.value = store.value!.tableCount;
+    updated.value = store.value!.updated;
+    businessHours.value = store.value!.businessHours;
+    breakTime.value = store.value!.breakTime;
+    lastOrder.value = store.value!.lastOrder;
+    // 앱바 색상 초기화
+    appBarIconColor.value = Colors.white;
+    appBarTextColor.value = Colors.transparent;
     isLoaded.value = true;
   }
 
@@ -129,7 +130,7 @@ class DetailsController extends GetxController {
   // 영업상태 업데이트
   Future<int> updateState(int storeId) async {
     var result = await _storeRepository.updateState(storeId);
-    if (result.runtimeType == StateResp) {
+    if (result.runtimeType == StateRespDto) {
       state.value = result.state;
       tableCount.value = result.tableCount;
       updated.value = result.updated;
@@ -143,21 +144,21 @@ class DetailsController extends GetxController {
 
   // 매장 전화 연결
   Future<void> launchPhoneUrl() async {
-    Uri phoneUrl = Uri.parse('tel:' + store.value.phone!);
+    Uri phoneUrl = Uri.parse('tel:' + store.value!.phone);
     await launchUrl(phoneUrl);
   }
 
   // 웹사이트 링크 연결
   Future<void> launchWebsiteUrl() async {
-    if (store.value.website != null) {
-      Uri websiteUrl = Uri.parse('https:' + store.value.website!);
+    if (store.value!.website != '') {
+      Uri websiteUrl = Uri.parse('https:' + store.value!.website);
       await launchUrl(websiteUrl);
     }
   }
 
   // 블로그 리뷰 링크 연결
   Future<void> launchBlogUrl(int index) async {
-    Uri blogLinkUrl = Uri.parse(store.value.blogList![index].link);
+    Uri blogLinkUrl = Uri.parse(store.value!.blogList[index].link);
     await launchUrl(blogLinkUrl);
   }
 
@@ -165,7 +166,7 @@ class DetailsController extends GetxController {
   Future<void> launchMoreResultsUrl() async {
     // 검색어
     String query =
-        store.value.jibunAddress!.split('')[1] + ' ' + store.value.name!;
+        store.value!.jibunAddress.split('')[1] + ' ' + store.value!.name;
     var uri =
         'https://search.naver.com/search.naver?query=$query&nso=&where=blog&sm=tab_opt';
     // URL 한글 인코딩

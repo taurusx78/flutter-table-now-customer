@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:table_now/ui/custom_color.dart';
 
-class DialogUI extends StatelessWidget {
+class CustomDialog extends StatelessWidget {
   final String content;
   final dynamic checkFunc;
 
-  const DialogUI({
+  const CustomDialog({
     Key? key,
     required this.content,
     required this.checkFunc,

@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:table_now/controller/search_controller.dart';
 import 'package:table_now/controller/store_controller.dart';
 import 'package:table_now/route/routes.dart';
-import 'package:table_now/ui/components/dialog_ui.dart';
+import 'package:table_now/ui/components/custom_dialog.dart';
+import 'package:table_now/ui/components/custom_divider.dart';
 import 'package:table_now/ui/components/kakao_banner_ad.dart';
 import 'package:table_now/ui/components/show_toast.dart';
 import 'package:table_now/ui/custom_color.dart';
@@ -80,14 +81,15 @@ class SearchPage extends GetView<SearchController> {
     return SizedBox(
       width: 600,
       child: TextField(
-        maxLength: 50, // 최대 길이 제한
         controller: controller.search,
         focusNode: _focusNode,
-        autofocus: true,
         style: const TextStyle(fontSize: 16),
+        autofocus: true,
+        maxLength: 50,
         decoration: InputDecoration(
           hintText: '지역 + 매장명을 입력해 주세요.',
           hintStyle: const TextStyle(fontSize: 16, color: Colors.black54),
+          counterText: '',
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(color: primaryColor, width: 2),
@@ -275,10 +277,8 @@ class SearchPage extends GetView<SearchController> {
           )
         ],
       ),
-      separatorBuilder: (context, index) => Container(
-        height: 1,
-        color: blueGrey,
-      ),
+      separatorBuilder: (context, index) =>
+          const CustomDivider(top: 0, bottom: 0),
     );
   }
 
@@ -303,7 +303,7 @@ class SearchPage extends GetView<SearchController> {
       context: context,
       barrierDismissible: false, // 버튼 선택으로만 Dialog 닫을 수 있도록 설정
       builder: (BuildContext context) {
-        return DialogUI(
+        return CustomDialog(
           content: content,
           checkFunc: checkFunc,
         );

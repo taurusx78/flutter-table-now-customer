@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_now/controller/details_controller.dart';
+import 'package:table_now/ui/components/custom_divider.dart';
 import 'package:table_now/ui/components/loading_indicator.dart';
-import 'package:table_now/ui/custom_color.dart';
+import 'package:table_now/ui/details/components/info_row_text.dart';
 import 'package:table_now/ui/details/components/time_row_text.dart';
 import 'package:table_now/ui/screen_size.dart';
 
@@ -19,7 +21,6 @@ class HoursBottomSheet extends StatelessWidget {
       height: getScreenHeight(context) * 0.6,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
         color: Colors.white,
@@ -27,21 +28,29 @@ class HoursBottomSheet extends StatelessWidget {
       child: Column(
         children: [
           // 헤더
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 15),
-            child: Text(
-              '영업시간',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  '전체 영업시간',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                InfoRowText(
+                  text: '해당 정보는 매장 상황에 따라 오늘의 영업시간 정보와 다를 수 있습니다.',
+                  margin: 40,
+                  textColor: Colors.black54,
+                ),
+              ],
             ),
           ),
-          Container(
-            height: 1,
-            color: blueGrey,
-          ),
+          const CustomDivider(height: 3, top: 0, bottom: 0),
           Obx(
             () {
               if (controller.isHoursLoaded.value) {
-                var weeklyHours = controller.weeklyHours.value.weeklyHours!;
+                var weeklyHours = controller.weeklyHours.value!.weeklyHours;
                 double width = getScreenWidth(context) - 150;
                 return Expanded(
                   child: ListView.separated(
@@ -56,10 +65,8 @@ class HoursBottomSheet extends StatelessWidget {
                         width,
                       );
                     },
-                    separatorBuilder: (context, index) => Container(
-                      height: 1,
-                      color: blueGrey,
-                    ),
+                    separatorBuilder: (context, index) =>
+                        const CustomDivider(top: 0, bottom: 0),
                   ),
                 );
               } else {
@@ -90,7 +97,12 @@ class HoursBottomSheet extends StatelessWidget {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TimeRowText(title: '영업시간', info: businessHours),
+                    TimeRowText(
+                      title: '영업시간',
+                      info: businessHours == '00:00-00:00'
+                          ? '24시 영업'
+                          : businessHours,
+                    ),
                     const SizedBox(height: 10),
                     TimeRowText(title: '휴게시간', info: breakTime),
                     if (lastOrder != '없음')
@@ -103,7 +115,7 @@ class HoursBottomSheet extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 10),
                         child: TimeRowText(
                           title: '정기휴무',
-                          info: '매월 $holidayWeek $day요일',
+                          info: '매월 $holidayWeek $day요일 휴무',
                           width: width,
                         ),
                       ),

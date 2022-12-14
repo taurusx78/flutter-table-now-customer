@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:table_now/controller/details_controller.dart';
 import 'package:table_now/data/store/model/notice.dart';
 import 'package:table_now/route/routes.dart';
+import 'package:table_now/ui/components/custom_divider.dart';
 import 'package:table_now/ui/custom_color.dart';
 import 'package:table_now/ui/screen_size.dart';
 import 'package:table_now/util/host.dart';
@@ -56,11 +57,7 @@ class NoticeSwiper extends StatelessWidget {
               loop: false,
             ),
           ),
-          Container(
-            height: 1,
-            color: blueGrey,
-            margin: const EdgeInsets.only(top: 20),
-          ),
+          const CustomDivider(top: 20, bottom: 0),
         ],
       ),
     );
@@ -196,7 +193,7 @@ class NoticeSwiper extends StatelessWidget {
       builder: (context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(10),
           ),
           contentPadding: EdgeInsets.zero,
           content: Builder(
@@ -210,9 +207,8 @@ class NoticeSwiper extends StatelessWidget {
                   children: [
                     // 첨부사진이 있는 경우
                     if (notice.imageUrlList.isNotEmpty)
-                      Container(
+                      SizedBox(
                         height: getScreenHeight(context) * 0.3,
-                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                         child: _buildNoticeImageList(notice.imageUrlList),
                       ),
                     Padding(
@@ -245,12 +241,12 @@ class NoticeSwiper extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 20),
                           // 제목
                           Text(
                             notice.title,
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -321,7 +317,10 @@ class NoticeSwiper extends StatelessWidget {
           itemBuilder: (context, index) {
             return GestureDetector(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                ),
                 child: Image.network(
                   '$host/image?type=notice&filename=' + imageUrlList[index],
                   width: double.infinity,
