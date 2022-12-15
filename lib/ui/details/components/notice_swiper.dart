@@ -96,10 +96,12 @@ class NoticeSwiper extends StatelessWidget {
                       ),
                     ),
                   ),
-                SizedBox(
+                Container(
                   width: existImage
                       ? getScreenWidth(context) - 152
                       : getScreenWidth(context) - 52,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -116,7 +118,7 @@ class NoticeSwiper extends StatelessWidget {
                           const SizedBox(width: 8),
                           // 알림 등록일
                           Text(
-                            '${notice.createdDate} 등록',
+                            notice.createdDate,
                             style: const TextStyle(
                                 fontSize: 14, color: Colors.black54),
                           ),
@@ -190,18 +192,21 @@ class NoticeSwiper extends StatelessWidget {
       context, Notice notice, bool existImage, bool hasHoliday) {
     showDialog(
       context: context,
+      barrierColor: Colors.white70,
       builder: (context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
           ),
           contentPadding: EdgeInsets.zero,
           content: Builder(
             builder: (context) {
               return SizedBox(
-                width: getScreenWidth(context) * 0.9,
+                width: getScreenWidth(context) < 600
+                    ? getScreenWidth(context) * 0.9
+                    : 540,
                 height: existImage
-                    ? getScreenHeight(context) * 0.6
+                    ? getScreenHeight(context) * 0.55
                     : getScreenHeight(context) * 0.3,
                 child: ListView(
                   children: [
@@ -212,7 +217,8 @@ class NoticeSwiper extends StatelessWidget {
                         child: _buildNoticeImageList(notice.imageUrlList),
                       ),
                     Padding(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -233,15 +239,15 @@ class NoticeSwiper extends StatelessWidget {
                               ),
                               // 알림 등록일
                               Text(
-                                '${notice.createdDate} 등록',
+                                notice.createdDate,
                                 style: const TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 15,
                                   color: Colors.black54,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          const CustomDivider(top: 15, bottom: 20),
                           // 제목
                           Text(
                             notice.title,
@@ -282,23 +288,23 @@ class NoticeSwiper extends StatelessWidget {
     return RichText(
       text: TextSpan(
         children: [
-          WidgetSpan(
+          const WidgetSpan(
             alignment: PlaceholderAlignment.middle,
             child: Padding(
-              padding: const EdgeInsets.only(right: 5),
+              padding: EdgeInsets.only(right: 5, bottom: 2),
               child: Icon(
                 Icons.event_note,
-                size: iconSize,
-                color: red,
+                size: 19,
+                color: darkNavy2,
               ),
             ),
           ),
           TextSpan(
             text:
-                '${holidayStart.substring(2)} ~ ${holidayEnd.substring(2)} 휴무',
+                '${holidayStart.substring(2)} - ${holidayEnd.substring(2)} 휴무',
             style: TextStyle(
               fontSize: fontSize,
-              color: Colors.black,
+              color: darkNavy2,
             ),
           )
         ],
@@ -318,8 +324,8 @@ class NoticeSwiper extends StatelessWidget {
             return GestureDetector(
               child: ClipRRect(
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
+                  topLeft: Radius.circular(5),
+                  topRight: Radius.circular(5),
                 ),
                 child: Image.network(
                   '$host/image?type=notice&filename=' + imageUrlList[index],

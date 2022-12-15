@@ -42,12 +42,6 @@ class CategoryPage extends StatelessWidget {
                 // 광고
                 const KakaoBannerAd(),
                 const SizedBox(height: 20),
-                // 위치 확인 문구
-                const Text(
-                  '현재 위치를 확인해 주세요.',
-                  style: TextStyle(fontSize: 15, color: primaryColor),
-                ),
-                const SizedBox(height: 15),
                 // 현재 위치
                 LocationBar(
                   tapFunc: () async {

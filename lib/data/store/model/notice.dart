@@ -24,6 +24,6 @@ class Notice {
         content = json['content'],
         holidayStartDate = json['holidayStartDate'].replaceAll('-', '.'),
         holidayEndDate = json['holidayEndDate'].replaceAll('-', '.'),
-        createdDate = json['createdDate'].substring(2, 10).replaceAll('-', '.'),
+        createdDate = json['createdDate'].substring(0, 10).replaceAll('-', '.'),
         imageUrlList = List.from(json['imageUrlList']);
 }

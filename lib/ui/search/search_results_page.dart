@@ -100,14 +100,15 @@ class SearchResultsPage extends GetView<SearchController> {
     return SizedBox(
       width: 600,
       child: TextField(
-        maxLength: 50, // 최대 길이 제한
         controller: controller.search,
         focusNode: _focusNode,
-        autofocus: false,
         style: const TextStyle(fontSize: 15),
+        autofocus: false,
+        maxLength: 50,
         decoration: InputDecoration(
           hintText: '지역 + 매장명을 입력해 주세요.',
           hintStyle: const TextStyle(fontSize: 15, color: Colors.black54),
+          counterText: '',
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(color: primaryColor, width: 2),

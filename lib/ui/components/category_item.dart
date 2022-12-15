@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_now/controller/store_controller.dart';
@@ -35,7 +36,8 @@ class CategoryItem extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
               child: Image.asset(
-                'assets/images/$image',
+                'assets/images/category/$image',
+                fit: BoxFit.cover,
               ),
             ),
           ),

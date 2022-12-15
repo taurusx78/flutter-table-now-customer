@@ -218,23 +218,23 @@ class DetailsPage extends GetView<DetailsController> {
           const SizedBox(height: 15),
           RichText(
             text: TextSpan(
-              style: const TextStyle(fontSize: 15, color: darkNavy),
+              style: const TextStyle(fontSize: 15, color: Colors.black),
               children: [
                 // 업데이트 시간
                 const WidgetSpan(
                   child: Icon(
                     Icons.update,
-                    color: darkNavy,
+                    color: primaryColor,
                     size: 18,
                   ),
                 ),
                 TextSpan(
-                  text: ' 업데이트 ${Jiffy(controller.updated.value).fromNow()}',
+                  text:
+                      ' 업데이트 ${controller.updated.value.substring(5, 16).replaceAll('T', ' ').replaceAll('-', '.')}',
                 ),
                 TextSpan(
-                  text:
-                      ' (${controller.updated.value.substring(5, 16).replaceAll('T', ' ').replaceAll('-', '.')})',
-                  style: const TextStyle(color: Colors.black54),
+                  text: ' (${Jiffy(controller.updated.value).fromNow()})',
+                  style: const TextStyle(color: Colors.black),
                 )
               ],
             ),

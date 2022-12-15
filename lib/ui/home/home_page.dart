@@ -1,76 +1,79 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:table_now/controller/details_controller.dart';
+import 'package:table_now/controller/location_controller.dart';
 import 'package:table_now/controller/main_controller.dart';
 import 'package:table_now/data/category.dart';
 import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/category_item.dart';
 import 'package:table_now/ui/components/kakao_banner_ad.dart';
+import 'package:table_now/ui/components/location_bar.dart';
+import 'package:table_now/ui/components/show_toast.dart';
 import 'package:table_now/ui/components/state_round_box.dart';
 import 'package:table_now/ui/custom_color.dart';
 import 'package:table_now/ui/screen_size.dart';
 import 'package:table_now/util/host.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({Key? key}) : super(key: key);
-
-  MainController controller = Get.find();
+class HomePage extends GetView<MainController> {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: Column(
+            children: [
+              // 앱 타이틀
+              _buildAppTitle(),
+              const SizedBox(height: 15),
+              // 검색바
+              _buildSearchBar(),
+            ],
+          ),
+          toolbarHeight: 130,
+        ),
         body: Align(
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
-            child: SizedBox(
+            child: Container(
               width: 600,
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 앱 제목
-                  Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: _buildAppTitle(),
+                  // 현재 위치
+                  LocationBar(
+                    tapFunc: () async {
+                      String result = await Get.find<LocationController>()
+                          .getCurrentLocation();
+                      showToast(context, result);
+                    },
                   ),
-                  // 배너 광고
-                  _buildBannerImageSwiper(context),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(15, 20, 15, 15),
-                    child: Column(
-                      children: [
-                        // 검색바
-                        _buildSearchBar(),
-                        const SizedBox(height: 30),
-                        // 카테고리 목록
-                        _buildCategoryList(),
-                        const SizedBox(height: 30),
-                        // 광고
-                        const KakaoBannerAd(),
-                        const SizedBox(height: 20),
-                        // 즐겨찾기 헤더
-                        _buildBookmarkHeader(),
-                        const SizedBox(height: 15),
-                        Obx(
-                          () => controller.isLoaded.value
-                              ? controller.bookmarkList.isNotEmpty
-                                  ? _buildBookmarkList()
-                                  : _buildNoBookmarkBox()
-                              : const SizedBox(
-                                  height: 200,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: primaryColor,
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                ),
-                        ),
-                      ],
-                    ),
+                  const SizedBox(height: 25),
+                  // 카테고리 목록
+                  _buildCategoryList(context),
+                  const SizedBox(height: 25),
+                  // 광고
+                  const KakaoBannerAd(),
+                  const SizedBox(height: 20),
+                  // 즐겨찾기 헤더
+                  _buildBookmarkHeader(),
+                  const SizedBox(height: 15),
+                  Obx(
+                    () => controller.isLoaded.value
+                        ? controller.bookmarkList.isNotEmpty
+                            ? _buildBookmarkList()
+                            : _buildNoBookmarkBox()
+                        : const SizedBox(
+                            height: 200,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: primaryColor,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ),
                   ),
                 ],
               ),
@@ -96,32 +99,6 @@ class HomePage extends StatelessWidget {
             style: TextStyle(color: primaryColor),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBannerImageSwiper(context) {
-    bool notWide = getScreenWidth(context) - 30 < 600;
-
-    return Container(
-      height: 250, // 높이 지정 필수!
-      padding: notWide ? null : const EdgeInsets.symmetric(horizontal: 15),
-      child: ClipRRect(
-        borderRadius:
-            notWide ? BorderRadius.circular(0) : BorderRadius.circular(10),
-        child: Swiper(
-          itemCount: 2,
-          itemBuilder: (context, index) {
-            return Image.asset(
-              'assets/test_banner/배너 이미지 ${index + 1}.jpg',
-              fit: BoxFit.cover,
-            );
-          },
-          autoplay: true,
-          pagination: const SwiperPagination(
-            margin: EdgeInsets.all(5.0),
-          ),
-        ),
       ),
     );
   }
@@ -154,60 +131,71 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryList() {
+  Widget _buildCategoryList(context) {
+    bool isNarrow = getScreenWidth(context) - 30 < 600;
+    int lastIndex = isNarrow ? 7 : 9;
+
     return SizedBox(
-      height: 100, // 높이 지정 필수!
-      child: ListView.separated(
+      width: 600,
+      child: GridView.builder(
         shrinkWrap: true,
-        scrollDirection: Axis.horizontal,
-        itemCount: 5,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: isNarrow ? 8 : 10,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: isNarrow ? 4 : 5, // 행에 보여줄 item 개수
+          mainAxisSpacing: 10, // item 수직 간격
+          crossAxisSpacing: 10, // item 수평 간격
+          childAspectRatio: isNarrow ? 1 / 1.3 : 1 / 1, // item 너비:높이 비율
+        ),
         itemBuilder: (context, index) {
-          4;
-          if (index < 4) {
+          if (index < lastIndex) {
             return CategoryItem(
               label: categoryList[index].label,
               image: categoryList[index].image,
               fontSize: 14,
             );
           } else {
-            return GestureDetector(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 75,
-                    height: 75,
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: blueGrey, width: 1),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: lightGrey,
-                      ),
-                      child: const Icon(
-                        Icons.more_horiz,
-                        size: 40,
-                        color: primaryColor,
-                      ),
-                    ),
-                  ),
-                  const Text(
-                    '더보기',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              onTap: () {
-                controller.changeIndex(1);
-              },
-            );
+            return _buildMoreButton();
           }
         },
-        separatorBuilder: (context, index) => const SizedBox(width: 10),
       ),
+    );
+  }
+
+  Widget _buildMoreButton() {
+    return GestureDetector(
+      child: Column(
+        children: [
+          Container(
+            width: 75,
+            height: 75,
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: blueGrey, width: 1),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                color: lightGrey,
+              ),
+              child: const Icon(
+                Icons.more_horiz,
+                size: 40,
+                color: primaryColor,
+              ),
+            ),
+          ),
+          const SizedBox(height: 5),
+          const Text(
+            '더보기',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+      onTap: () {
+        controller.changeIndex(1);
+      },
     );
   }
 
