@@ -57,7 +57,7 @@ class CategoryResultsPage extends GetView<StoreController> {
               LocationBar(tapFunc: () async {
                 String result =
                     await Get.find<LocationController>().getCurrentLocation();
-                showToast(context, result);
+                showToast(context, result, null);
                 // 현재위치를 기반으로 카테고리 매장 다시조회
                 controller.findAllByCategory(category);
               }),
@@ -76,11 +76,15 @@ class CategoryResultsPage extends GetView<StoreController> {
               const SizedBox(height: 15),
               // 검색매장 목록
               Obx(
-                () => controller.isLoaded.value
+                () => controller.loaded.value
                     ? Expanded(
                         child: controller.filteredStoreList.isNotEmpty
                             ? _buildResultsStoreList()
-                            : _buildNoStoreBox(),
+                            : controller.connected.value
+                                ? _buildNoStoreBox()
+                                : const Center(
+                                    child: Text('네트워크 연결을 확인해 주세요.'),
+                                  ),
                       )
                     : const LoadingIndicator(height: 200),
               ),
@@ -137,13 +141,13 @@ class CategoryResultsPage extends GetView<StoreController> {
             // 중간 광고 삽입
             if (index % 1 == 0)
               const Padding(
-                padding: EdgeInsets.only(top: 15),
+                padding: EdgeInsets.only(top: 12),
                 child: KakaoBannerAd(),
               ),
           ],
         );
       },
-      separatorBuilder: (context, index) => const SizedBox(height: 10),
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
     );
   }
 

@@ -8,12 +8,10 @@ import 'package:table_now/ui/custom_color.dart';
 import 'package:table_now/ui/details/components/time_row_text.dart';
 import 'package:table_now/ui/screen_size.dart';
 
-class HoursBottomSheet extends StatelessWidget {
+class HoursBottomSheet extends GetView<DetailsController> {
   HoursBottomSheet({Key? key}) : super(key: key);
 
   List<String> days = ['월', '화', '수', '목', '금', '토', '일'];
-
-  final DetailsController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -62,26 +60,32 @@ class HoursBottomSheet extends StatelessWidget {
           const CustomDivider(height: 2, top: 0, bottom: 0),
           Obx(
             () {
-              if (controller.isHoursLoaded.value) {
-                var weeklyHours = controller.weeklyHours.value!.weeklyHours;
-                double width = getScreenWidth(context) - 150;
-                return Expanded(
-                  child: ListView.separated(
-                    itemCount: 7,
-                    itemBuilder: (context, index) {
-                      return _buildHoursInfo(
-                        days[index],
-                        weeklyHours[index][0],
-                        weeklyHours[index][1],
-                        weeklyHours[index][2],
-                        weeklyHours[index][3],
-                        width,
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const CustomDivider(top: 0, bottom: 0),
-                  ),
-                );
+              if (controller.hoursLoaded.value) {
+                if (controller.weeklyHours != null) {
+                  var weeklyHours = controller.weeklyHours!.weeklyHours;
+                  double width = getScreenWidth(context) - 150;
+                  return Expanded(
+                    child: ListView.separated(
+                      itemCount: 7,
+                      itemBuilder: (context, index) {
+                        return _buildHoursInfo(
+                          days[index],
+                          weeklyHours[index][0],
+                          weeklyHours[index][1],
+                          weeklyHours[index][2],
+                          weeklyHours[index][3],
+                          width,
+                        );
+                      },
+                      separatorBuilder: (context, index) =>
+                          const CustomDivider(top: 0, bottom: 0),
+                    ),
+                  );
+                } else {
+                  return const Center(
+                    child: Text('네트워크 연결을 확인해 주세요.'),
+                  );
+                }
               } else {
                 return const LoadingIndicator(height: 200);
               }

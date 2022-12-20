@@ -6,14 +6,13 @@ import 'package:table_now/ui/components/kakao_banner_ad.dart';
 import 'package:table_now/ui/components/store_item.dart';
 import 'package:table_now/ui/custom_color.dart';
 
-class BookmarkPage extends StatelessWidget {
-  BookmarkPage({Key? key}) : super(key: key);
-
-  final MainController controller = Get.find();
+class BookmarkPage extends GetView<MainController> {
+  const BookmarkPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // 즐겨찾기 전체조회
+    print('즐겨찾기 전체조회');
     controller.findAllBookmark(true);
 
     return Scaffold(
@@ -33,10 +32,14 @@ class BookmarkPage extends StatelessWidget {
         ],
       ),
       body: Obx(
-        () => controller.isLoaded.value
+        () => controller.loaded.value
             ? controller.bookmarkList.isNotEmpty
                 ? _buildBookmarkList()
-                : _buildNoBookmarkBox()
+                : controller.connected.value
+                    ? _buildNoBookmarkBox()
+                    : const Center(
+                        child: Text('네트워크 연결을 확인해 주세요.'),
+                      )
             : Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

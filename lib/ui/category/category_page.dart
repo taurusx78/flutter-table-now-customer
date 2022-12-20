@@ -41,13 +41,13 @@ class CategoryPage extends StatelessWidget {
               children: [
                 // 광고
                 const KakaoBannerAd(),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15),
                 // 현재 위치
                 LocationBar(
                   tapFunc: () async {
                     String result = await Get.find<LocationController>()
                         .getCurrentLocation();
-                    showToast(context, result);
+                    showToast(context, result, null);
                   },
                 ),
                 const SizedBox(height: 30),

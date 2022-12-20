@@ -50,7 +50,7 @@ class SearchResultsPage extends GetView<SearchController> {
                     LocationBar(tapFunc: () async {
                       String result = await Get.find<LocationController>()
                           .getCurrentLocation();
-                      showToast(context, result);
+                      showToast(context, result, null);
                       // 현재위치를 기반으로 검색매장 다시조회
                       _storeController.findAllByName(controller.search.text);
                     }),
@@ -69,12 +69,16 @@ class SearchResultsPage extends GetView<SearchController> {
                     const SizedBox(height: 15),
                     // 검색매장 목록
                     Obx(
-                      () => _storeController.isLoaded.value
+                      () => _storeController.loaded.value
                           ? Expanded(
                               child:
                                   _storeController.filteredStoreList.isNotEmpty
                                       ? _buildResultsStoreList()
-                                      : _buildNoStoreBox(),
+                                      : _storeController.connected.value
+                                          ? _buildNoStoreBox()
+                                          : const Center(
+                                              child: Text('네트워크 연결을 확인해 주세요.'),
+                                            ),
                             )
                           : const LoadingIndicator(height: 200),
                     ),
@@ -82,7 +86,7 @@ class SearchResultsPage extends GetView<SearchController> {
                 ),
                 // 연관검색어 매장 목록
                 Obx(
-                  () => controller.isFilled.value
+                  () => controller.filled.value
                       ? Positioned(
                           child: _buildRelatedStoreList(),
                         )
@@ -152,7 +156,7 @@ class SearchResultsPage extends GetView<SearchController> {
           } else {
             _focusNode.requestFocus(); // TextField 포커스 유지
             controller.search.clear();
-            showToast(context, '검색어를 입력해 주세요.');
+            showToast(context, '검색어를 입력해 주세요.', null);
           }
         },
       ),
@@ -238,13 +242,13 @@ class SearchResultsPage extends GetView<SearchController> {
             // 중간 광고 삽입
             if (index % 1 == 0)
               const Padding(
-                padding: EdgeInsets.only(top: 15),
+                padding: EdgeInsets.only(top: 12),
                 child: KakaoBannerAd(),
               ),
           ],
         );
       },
-      separatorBuilder: (context, index) => const SizedBox(height: 10),
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
     );
   }
 

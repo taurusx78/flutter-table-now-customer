@@ -10,7 +10,7 @@ import 'dto/hours_resp_dto.dart';
 
 class DetailsController extends GetxController {
   final StoreRepository _storeRepository = StoreRepository();
-  final store = Rxn<Store>();
+  Store? store;
   final RxString state = ''.obs; // 영업상태
   final RxInt tableCount = 0.obs; // 잔여테이블 수
   final RxString updated = ''.obs; // 업데이트 시간
@@ -18,11 +18,11 @@ class DetailsController extends GetxController {
   final RxString breakTime = ''.obs; // 오늘의 휴게시간
   final RxString lastOrder = ''.obs; // 오늘의 주문마감시간
 
-  final RxBool isLoaded = true.obs; // 상세보기 조회 완료 여부
-  final RxBool isBookmarked = false.obs; // 즐겨찾기 포함 여부
+  final RxBool loaded = true.obs; // 상세보기 조회 완료 여부
+  final RxBool bookmarked = false.obs; // 즐겨찾기 포함 여부
 
-  final weeklyHours = Rxn<HoursRespDto>(); // 전체 영업시간
-  final RxBool isHoursLoaded = true.obs; // 전체 영업시간 조회 완료 여부
+  HoursRespDto? weeklyHours; // 전체 영업시간
+  final RxBool hoursLoaded = true.obs; // 전체 영업시간 조회 완료 여부
 
   // 대표사진 현재 인덱스
   final RxInt curBasicImageIndex = 0.obs;
@@ -74,47 +74,49 @@ class DetailsController extends GetxController {
 
   // 매장 상세조회
   Future<void> findById(int storeId) async {
-    isLoaded.value = false;
-    store.value = await _storeRepository.findById(storeId);
-    // 즐겨찾기 포함 여부 조회
-    await checkIsBookmarked(storeId);
-    state.value = store.value!.state;
-    tableCount.value = store.value!.tableCount;
-    updated.value = store.value!.updated;
-    businessHours.value = store.value!.businessHours;
-    breakTime.value = store.value!.breakTime;
-    lastOrder.value = store.value!.lastOrder;
-    // 앱바 색상 초기화
-    appBarIconColor.value = Colors.white;
-    appBarTextColor.value = Colors.transparent;
-    isLoaded.value = true;
+    loaded.value = false;
+    store = await _storeRepository.findById(storeId);
+    if (store != null) {
+      // 즐겨찾기 포함 여부 조회
+      await checkIsBookmarked(storeId);
+      state.value = store!.state;
+      tableCount.value = store!.tableCount;
+      updated.value = store!.updated;
+      businessHours.value = store!.businessHours;
+      breakTime.value = store!.breakTime;
+      lastOrder.value = store!.lastOrder;
+      // 앱바 색상 초기화
+      appBarIconColor.value = Colors.white;
+      appBarTextColor.value = Colors.transparent;
+    }
+    loaded.value = true;
   }
 
   // 즐겨찾기 포함 여부 조회
   Future<void> checkIsBookmarked(int storeId) async {
     int? result = await SqliteHelper.checkIsBookmarked(storeId);
     if (result! > 0) {
-      isBookmarked.value = true;
+      bookmarked.value = true;
     } else {
-      isBookmarked.value = false;
+      bookmarked.value = false;
     }
   }
 
   // 즐겨찾기 추가/제거
   Future<String> changeIsBookmarked(int storeId) async {
-    if (!isBookmarked.value) {
+    if (!bookmarked.value) {
       if (await SqliteHelper.findTotalCount() == 100) {
         // 최대 100개
         return '즐겨찾기는 최대 100개까지 등록할 수 있습니다.';
       } else {
         // 즐겨찾기에 추가
-        isBookmarked.value = !isBookmarked.value;
+        bookmarked.value = !bookmarked.value;
         await SqliteHelper.addStoreId(storeId);
         return '즐겨찾기에 추가되었습니다.';
       }
     } else {
       // 즐겨찾기에서 제거
-      isBookmarked.value = !isBookmarked.value;
+      bookmarked.value = !bookmarked.value;
       await SqliteHelper.deleteByStoreId(storeId);
       return '즐겨찾기에서 제거되었습니다.';
     }
@@ -122,51 +124,49 @@ class DetailsController extends GetxController {
 
   // 영업시간 전체조회
   Future<void> findHours(int storeId) async {
-    isHoursLoaded.value = false;
-    weeklyHours.value = await _storeRepository.findHours(storeId);
-    isHoursLoaded.value = true;
+    hoursLoaded.value = false;
+    weeklyHours = await _storeRepository.findHours(storeId);
+    hoursLoaded.value = true;
   }
 
   // 영업상태 업데이트
-  Future<int> updateState(int storeId) async {
+  Future<StateRespDto?> updateState(int storeId) async {
     var result = await _storeRepository.updateState(storeId);
     if (result.runtimeType == StateRespDto) {
-      state.value = result.state;
+      state.value = result!.state;
       tableCount.value = result.tableCount;
       updated.value = result.updated;
       businessHours.value = result.businessHours;
       breakTime.value = result.breakTime;
       lastOrder.value = result.lastOrder;
-      result = 1;
     }
     return result;
   }
 
   // 매장 전화 연결
   Future<void> launchPhoneUrl() async {
-    Uri phoneUrl = Uri.parse('tel:' + store.value!.phone);
+    Uri phoneUrl = Uri.parse('tel:' + store!.phone);
     await launchUrl(phoneUrl);
   }
 
   // 웹사이트 링크 연결
   Future<void> launchWebsiteUrl() async {
-    if (store.value!.website != '') {
-      Uri websiteUrl = Uri.parse('https:' + store.value!.website);
+    if (store!.website != '') {
+      Uri websiteUrl = Uri.parse('https:' + store!.website);
       await launchUrl(websiteUrl);
     }
   }
 
   // 블로그 리뷰 링크 연결
   Future<void> launchBlogUrl(int index) async {
-    Uri blogLinkUrl = Uri.parse(store.value!.blogList[index].link);
+    Uri blogLinkUrl = Uri.parse(store!.blogList[index].link);
     await launchUrl(blogLinkUrl);
   }
 
   // 블로그 더보기 검색결과 연결
   Future<void> launchMoreResultsUrl() async {
     // 검색어
-    String query =
-        store.value!.jibunAddress.split('')[1] + ' ' + store.value!.name;
+    String query = store!.jibunAddress.split('')[1] + ' ' + store!.name;
     var uri =
         'https://search.naver.com/search.naver?query=$query&nso=&where=blog&sm=tab_opt';
     // URL 한글 인코딩
@@ -176,13 +176,13 @@ class DetailsController extends GetxController {
 
   // 매장정보 수정제안
   Future<int> requestUpdate(int storeId) async {
-    List<String> checkedItems = [];
+    List<int> checkedIndexes = [];
     for (int i = 0, len = infoItems.length; i < len; i++) {
       if (itemIsChecked[i].value) {
-        checkedItems.add(infoItems[i]);
+        checkedIndexes.add(i);
       }
     }
-    Map<String, List<String>> data = {'items': checkedItems};
+    Map<String, List<int>> data = {'infoIndexList': checkedIndexes};
     return await _storeRepository.requestUpdate(storeId, data);
   }
 

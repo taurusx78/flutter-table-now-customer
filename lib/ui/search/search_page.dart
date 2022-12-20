@@ -63,7 +63,7 @@ class SearchPage extends GetView<SearchController> {
                 ),
                 // 연관검색어 매장 목록
                 Obx(
-                  () => controller.isFilled.value
+                  () => controller.filled.value
                       ? Positioned(
                           child: _buildRelatedStoreList(),
                         )
@@ -138,7 +138,7 @@ class SearchPage extends GetView<SearchController> {
           } else {
             _focusNode.requestFocus(); // TextField 포커스 유지
             controller.search.clear();
-            showToast(context, '검색어를 입력해 주세요.');
+            showToast(context, '검색어를 입력해 주세요.', null);
           }
         },
       ),

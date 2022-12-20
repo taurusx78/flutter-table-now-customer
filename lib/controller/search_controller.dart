@@ -12,7 +12,7 @@ class SearchController extends GetxController {
 
   final search = TextEditingController();
   final RxList relatedStoreList = <StoreNameRespDto>[].obs; // 연관검색어 매장 목록
-  final RxBool isFilled = false.obs; // 텍스트필드 입력 여부
+  final RxBool filled = false.obs; // 텍스트필드 입력 여부
 
   @override
   Future<void> onInit() async {
@@ -83,14 +83,16 @@ class SearchController extends GetxController {
   // 연관검색어 매장 목록 변경
   void changeRelatedStoreList(String value) {
     List<StoreNameRespDto> temp = [];
-    for (StoreNameRespDto storeName in allStoreName!) {
-      if (storeName.name.contains(value)) {
-        temp.add(storeName);
+    if (allStoreName != null) {
+      for (StoreNameRespDto storeName in allStoreName!) {
+        if (storeName.name.contains(value)) {
+          temp.add(storeName);
+        }
+        // 최대 길이 20으로 제한
+        if (temp.length == 20) break;
       }
-      // 최대 길이 20으로 제한
-      if (temp.length == 20) break;
+      relatedStoreList.value = temp;
     }
-    relatedStoreList.value = temp;
   }
 
   // 연관검색어 매장 목록 초기화
@@ -100,10 +102,6 @@ class SearchController extends GetxController {
 
   // 텍스트필드 입력 유무
   void changeIsFilled() {
-    if (search.text != '') {
-      isFilled.value = true;
-    } else {
-      isFilled.value = false;
-    }
+    filled.value = search.text != '';
   }
 }

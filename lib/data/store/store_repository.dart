@@ -17,104 +17,109 @@ class StoreRepository {
   // 매장명 전체조회
   Future<void> findAllStoreName() async {
     Response response = await _storeProvider.findAllStoreName();
-    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
-
-    if (dto.code == 1) {
-      List<dynamic> temp = dto.response;
-      allStoreName = temp.map((e) => StoreNameRespDto.fromJson(e)).toList();
-      storeNameUpdated = DateTime.now();
+    if (response.body != null) {
+      CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
+      if (dto.code == 1) {
+        List<dynamic> temp = dto.response;
+        allStoreName = temp.map((e) => StoreNameRespDto.fromJson(e)).toList();
+        storeNameUpdated = DateTime.now();
+      }
     }
   }
 
   // 즐겨찾기 전체조회
-  Future<List<StoreRespDto>> findAllBookmark(String storeIds) async {
+  Future<List<StoreRespDto>?> findAllBookmark(String storeIds) async {
     Response response = await _storeProvider.findAllBookmark(storeIds);
-    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
-
-    if (dto.code == 1) {
-      List<dynamic> temp = dto.response;
-      List<StoreRespDto> storeList =
-          temp.map((store) => StoreRespDto.fromJson(store)).toList();
-      return storeList;
-    } else {
-      return <StoreRespDto>[]; // StoreResp 타입의 빈 배열 반환
+    if (response.body != null) {
+      CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
+      if (dto.code == 1) {
+        List<dynamic> temp = dto.response;
+        List<StoreRespDto> storeList =
+            temp.map((store) => StoreRespDto.fromJson(store)).toList();
+        return storeList;
+      }
     }
+    return null; // 네트워크 연결 안됨
   }
 
   // 검색매장 전체조회
-  Future<List<StoreRespDto>> findAllByName(
+  Future<List<StoreRespDto>?> findAllByName(
       String name, double latitude, double longitude) async {
     Response response =
         await _storeProvider.findAllByName(name, latitude, longitude);
-    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
-
-    if (dto.code == 1) {
-      List<dynamic> temp = dto.response;
-      List<StoreRespDto> storeList =
-          temp.map((store) => StoreRespDto.fromJson(store)).toList();
-      return storeList;
-    } else {
-      return <StoreRespDto>[]; // StoreResp 타입의 빈 배열 반환
+    if (response.body != null) {
+      CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
+      if (dto.code == 1) {
+        List<dynamic> temp = dto.response;
+        List<StoreRespDto> storeList =
+            temp.map((store) => StoreRespDto.fromJson(store)).toList();
+        return storeList;
+      }
     }
+    return null; // 네트워크 연결 안됨
   }
 
   // 카테고리 매장 전체조회
-  Future<List<StoreRespDto>> findAllByCategory(
+  Future<List<StoreRespDto>?> findAllByCategory(
       String category, double latitude, double longitude) async {
     Response response =
         await _storeProvider.findAllByCategory(category, latitude, longitude);
-    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
-
-    if (dto.code == 1) {
-      List<dynamic> temp = dto.response;
-      List<StoreRespDto> storeList =
-          temp.map((store) => StoreRespDto.fromJson(store)).toList();
-      return storeList;
-    } else {
-      return <StoreRespDto>[]; // StoreResp 타입의 빈 배열 반환
+    if (response.body != null) {
+      CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
+      if (dto.code == 1) {
+        List<dynamic> temp = dto.response;
+        List<StoreRespDto> storeList =
+            temp.map((store) => StoreRespDto.fromJson(store)).toList();
+        return storeList;
+      }
     }
+    return null; // 네트워크 연결 안됨
   }
 
   // 매장 상세조회
-  Future<dynamic> findById(int storeId) async {
+  Future<Store?> findById(int storeId) async {
     Response response = await _storeProvider.findById(storeId);
-    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
-
-    if (dto.code == 1) {
-      return Store.fromJson(dto.response);
-    } else {
-      return null;
+    if (response.body != null) {
+      CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
+      if (dto.code == 1) {
+        return Store.fromJson(dto.response);
+      }
     }
+    return null; // 네트워크 연결 안됨
   }
 
   // 영업시간 전체조회
-  Future<dynamic> findHours(int storeId) async {
+  Future<HoursRespDto?> findHours(int storeId) async {
     Response response = await _storeProvider.findHours(storeId);
-    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
-
-    if (dto.code == 1) {
-      return HoursRespDto.fromJson(dto.response);
-    } else {
-      return -1;
+    if (response.body != null) {
+      CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
+      if (dto.code == 1) {
+        return HoursRespDto.fromJson(dto.response);
+      }
     }
+    return null; // 네트워크 연결 안됨
   }
 
   // 영업상태 조회
-  Future<dynamic> updateState(int storeId) async {
+  Future<StateRespDto?> updateState(int storeId) async {
     Response response = await _storeProvider.updateState(storeId);
-    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
-
-    if (dto.code == 1) {
-      return StateRespDto.fromJson(dto.response);
-    } else {
-      return -1;
+    if (response.body != null) {
+      CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
+      if (dto.code == 1) {
+        return StateRespDto.fromJson(dto.response);
+      }
     }
+    return null; // 네트워크 연결 안됨
   }
 
   // 매장정보 수정제안
   Future<int> requestUpdate(int storeId, Map data) async {
     Response response = await _storeProvider.requestUpdate(storeId, data);
-    CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
-    return dto.code;
+    if (response.body != null) {
+      CodeMsgRespDto dto = CodeMsgRespDto.fromJson(response.body);
+      return dto.code; // 제안 성공 (1), 유효성검사 실패 (-1)
+    } else {
+      return -3; // 네트워크 연결 안됨
+    }
   }
 }

@@ -9,7 +9,8 @@ class StoreController extends GetxController {
   final RxList<StoreRespDto> allStoreList = <StoreRespDto>[].obs; // 전체매장 목록
   final RxList<StoreRespDto> filteredStoreList =
       <StoreRespDto>[].obs; // 필터 적용 매장 목록
-  final RxBool isLoaded = true.obs; // 매장 조회 완료 여부
+  final RxBool loaded = true.obs; // 매장 조회 완료 여부
+  final RxBool connected = true.obs; // 네트워크 연결 여부
 
   // 영업상태 필터
   final List<String> filterList = ['영업중', '잔여있음', '전체'];
@@ -21,36 +22,46 @@ class StoreController extends GetxController {
 
   // 검색매장 전체조회
   Future<void> findAllByName(String name) async {
-    isLoaded.value = false;
-
-    allStoreList.value = await _storeRepository.findAllByName(
+    loaded.value = false;
+    connected.value = true;
+    var result = await _storeRepository.findAllByName(
         name, _locationController.myLat.value, _locationController.myLon.value);
-    if (allStoreList.isNotEmpty) {
-      // 검색 결과 있는 경우, 선택된 필터 적용
-      filterStoreList();
+    if (result != null) {
+      allStoreList.value = result;
+      if (allStoreList.isNotEmpty) {
+        // 검색 결과 있는 경우, 선택된 필터 적용
+        filterStoreList();
+      } else {
+        filteredStoreList.value = [];
+      }
     } else {
       filteredStoreList.value = [];
+      connected.value = false;
     }
-
-    isLoaded.value = true;
+    loaded.value = true;
   }
 
   // 카테고리 매장 전체조회
   Future<void> findAllByCategory(String category) async {
-    isLoaded.value = false;
-
-    allStoreList.value = await _storeRepository.findAllByCategory(category,
+    loaded.value = false;
+    connected.value = true;
+    var result = await _storeRepository.findAllByCategory(category,
         _locationController.myLat.value, _locationController.myLon.value);
-    // 검색 필터 & 정렬 선택항목 초기화
-    initializeFilterSort();
-    if (allStoreList.isNotEmpty) {
-      // 선택된 필터 적용
-      filterStoreList();
+    if (result != null) {
+      allStoreList.value = result;
+      // 검색 필터 & 정렬 선택항목 초기화
+      initializeFilterSort();
+      if (allStoreList.isNotEmpty) {
+        // 선택된 필터 적용
+        filterStoreList();
+      } else {
+        filteredStoreList.value = [];
+      }
     } else {
       filteredStoreList.value = [];
+      connected.value = false;
     }
-
-    isLoaded.value = true;
+    loaded.value = true;
   }
 
   // 선택된 필터 적용

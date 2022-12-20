@@ -10,7 +10,7 @@ class LocationController extends GetxController {
   final RxString myLocation = '서울 강남구'.obs; // 현재위치 지번주소
   final RxDouble myLat = 37.514575.obs; // 현재위치 위도
   final RxDouble myLon = 127.0495556.obs; // 현재위치 경도
-  final RxBool isLoaded = true.obs;
+  final RxBool loaded = true.obs;
 
   @override
   Future<void> onInit() async {
@@ -28,9 +28,8 @@ class LocationController extends GetxController {
 
   // 현재위치 정보 얻기
   Future<String> getCurrentLocation() async {
-    isLoaded.value = false;
+    loaded.value = false;
     String result = '';
-
     // 위치정보 수집동의 얻기
     LocationPermission permission = await Geolocator.requestPermission();
     print(permission);
@@ -79,8 +78,7 @@ class LocationController extends GetxController {
     } else {
       result = '위치정보 수집에 동의해 주세요.';
     }
-
-    isLoaded.value = true;
+    loaded.value = true;
     return result;
   }
 }

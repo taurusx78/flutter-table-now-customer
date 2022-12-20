@@ -31,7 +31,7 @@ class LocationBar extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Obx(
-                () => controller.isLoaded.value
+                () => controller.loaded.value
                     ? Text(
                         controller.myLocation.value,
                         style: const TextStyle(
@@ -54,7 +54,7 @@ class LocationBar extends StatelessWidget {
             ],
           ),
           Obx(
-            () => controller.isLoaded.value
+            () => controller.loaded.value
                 ? Material(
                     color: lightGrey,
                     child: InkWell(

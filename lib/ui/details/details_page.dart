@@ -30,71 +30,76 @@ class DetailsPage extends GetView<DetailsController> {
     return SafeArea(
       child: Scaffold(
         body: Obx(() {
-          if (controller.isLoaded.value) {
-            Store store = controller.store.value!;
-            return Align(
-              alignment: Alignment.topCenter,
-              child: SizedBox(
-                width: 600,
-                child: CustomScrollView(
-                  controller: controller.scrollController,
-                  slivers: [
-                    SliverAppBar(
-                      // 축소 시 상단에 AppBar 고정
-                      pinned: true,
-                      // 매장명
-                      title: Text(
-                        store.name,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: controller.appBarTextColor.value,
+          if (controller.loaded.value) {
+            if (controller.store != null) {
+              Store store = controller.store!;
+              return Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  width: 600,
+                  child: CustomScrollView(
+                    controller: controller.scrollController,
+                    slivers: [
+                      SliverAppBar(
+                        // 축소 시 상단에 AppBar 고정
+                        pinned: true,
+                        // 매장명
+                        title: Text(
+                          store.name,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: controller.appBarTextColor.value,
+                          ),
                         ),
+                        // 대표사진
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(10),
+                                bottomRight: Radius.circular(10),
+                              ),
+                              child: _buildBasicImageList(controller.store)),
+                        ),
+                        expandedHeight: 280,
+                        // 즐겨찾기 추가/삭제 버튼
+                        actions: [
+                          _buildLikeToggleButton(context),
+                        ],
+                        foregroundColor: controller.appBarIconColor.value,
+                        elevation: 0.5,
                       ),
-                      // 대표사진
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
-                            ),
-                            child:
-                                _buildBasicImageList(controller.store.value)),
+                      SliverList(
+                        delegate: SliverChildListDelegate([
+                          Column(
+                            children: [
+                              // 매장명/주소/영업상태/기능버튼
+                              _buildMainInfoBox(controller.store),
+                              const CustomDivider(height: 3, top: 0, bottom: 0),
+                              // 알림 목록
+                              if (store.noticeList.isNotEmpty)
+                                NoticeSwiper(noticeList: store.noticeList),
+                              // 그 외 매장 정보
+                              _buildSubInfoBox(context, store),
+                              // 블로그 리뷰 목록
+                              if (store.blogList.isNotEmpty)
+                                NaverBlogList(blogList: store.blogList),
+                              const CustomDivider(height: 5, top: 0, bottom: 0),
+                              // 안내문구
+                              _buildGuideText(context),
+                            ],
+                          )
+                        ]),
                       ),
-                      expandedHeight: 280,
-                      // 즐겨찾기 추가/삭제 버튼
-                      actions: [
-                        _buildLikeToggleButton(context),
-                      ],
-                      foregroundColor: controller.appBarIconColor.value,
-                      elevation: 0.5,
-                    ),
-                    SliverList(
-                      delegate: SliverChildListDelegate([
-                        Column(
-                          children: [
-                            // 매장명/주소/영업상태/기능버튼
-                            _buildMainInfoBox(controller.store.value),
-                            const CustomDivider(height: 3, top: 0, bottom: 0),
-                            // 알림 목록
-                            if (store.noticeList.isNotEmpty)
-                              NoticeSwiper(noticeList: store.noticeList),
-                            // 그 외 매장 정보
-                            _buildSubInfoBox(context, store),
-                            // 블로그 리뷰 목록
-                            if (store.blogList.isNotEmpty)
-                              NaverBlogList(blogList: store.blogList),
-                            const CustomDivider(height: 5, top: 0, bottom: 0),
-                            // 안내문구
-                            _buildGuideText(context),
-                          ],
-                        )
-                      ]),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
+              );
+            } else {
+              return const Center(
+                child: Text('네트워크 연결을 확인해 주세요.'),
+              );
+            }
           } else {
             return const LoadingIndicator(height: 200);
           }
@@ -112,11 +117,11 @@ class DetailsPage extends GetView<DetailsController> {
         // 버튼 회전 애니메이션
         controller.changeTurns();
         // 영업상태 업데이트
-        int result = await controller.updateState(storeId);
-        if (result == 1) {
-          showToast(context, '영업정보가 업데이트 되었습니다.');
+        var result = await controller.updateState(storeId);
+        if (result != null) {
+          showToast(context, '영업정보가 업데이트 되었습니다.', null);
         } else {
-          showErrorToast(context);
+          showToast(context, '네트워크 연결을 확인해 주세요.', 2000);
         }
       },
       backgroundColor: Colors.blueGrey,
@@ -172,7 +177,7 @@ class DetailsPage extends GetView<DetailsController> {
   Widget _buildLikeToggleButton(context) {
     return IconButton(
       splashRadius: 20,
-      icon: !controller.isBookmarked.value
+      icon: !controller.bookmarked.value
           ? const Icon(
               Icons.favorite_border_rounded,
             )
@@ -182,7 +187,7 @@ class DetailsPage extends GetView<DetailsController> {
             ),
       onPressed: () async {
         String result = await controller.changeIsBookmarked(storeId);
-        showToast(context, result);
+        showToast(context, result, null);
       },
     );
   }
@@ -671,7 +676,7 @@ class DetailsPage extends GetView<DetailsController> {
                       Navigator.pop(context2); // alertDialog 닫기
                       _showSendMailDialog(context);
                     } else {
-                      showToast(context2, '항목을 최소 하나 선택해주세요.');
+                      showToast(context2, '항목을 최소 하나 선택해주세요.', 2000);
                     }
                   },
                 ),
@@ -711,15 +716,18 @@ class DetailsPage extends GetView<DetailsController> {
       builder: (BuildContext context2) {
         return CustomDialog(
           content: '매장 정보 수정을 제안하는 메일을 전송하시겠습니까?',
-          checkFunc: () async {
+          checkFunc: () {
             Navigator.pop(context2); // alertDialog 닫기
             // 매장정보 수정제안
-            int result = await controller.requestUpdate(storeId);
-            if (result == 1) {
-              showToast(context, '메일이 전송되었습니다.');
-            } else {
-              showErrorToast(context);
-            }
+            controller.requestUpdate(storeId).then((result) {
+              if (result == 1) {
+                showToast(context, '메일이 전송되었습니다.', null);
+              } else if (result == -1) {
+                showToast(context, '부적절한 접근이 감지되었습니다.\n다시 시도해 주세요.', 3000);
+              } else if (result == -3) {
+                showToast(context, '네트워크 연결을 확인해 주세요.', 2000);
+              }
+            });
           },
         );
       },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_adfit/flutter_adfit.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:table_now/controller/details_controller.dart';
@@ -7,7 +8,7 @@ import 'package:table_now/controller/main_controller.dart';
 import 'package:table_now/data/category.dart';
 import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/category_item.dart';
-import 'package:table_now/ui/components/kakao_banner_ad.dart';
+import 'package:table_now/ui/components/custom_divider.dart';
 import 'package:table_now/ui/components/location_bar.dart';
 import 'package:table_now/ui/components/show_toast.dart';
 import 'package:table_now/ui/components/state_round_box.dart';
@@ -37,43 +38,56 @@ class HomePage extends GetView<MainController> {
         body: Align(
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
-            child: Container(
+            child: SizedBox(
               width: 600,
-              padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
               child: Column(
                 children: [
-                  // 현재 위치
-                  LocationBar(
-                    tapFunc: () async {
-                      String result = await Get.find<LocationController>()
-                          .getCurrentLocation();
-                      showToast(context, result);
-                    },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      children: [
+                        // 현재 위치
+                        LocationBar(
+                          tapFunc: () async {
+                            String result = await Get.find<LocationController>()
+                                .getCurrentLocation();
+                            showToast(context, result, null);
+                          },
+                        ),
+                        const SizedBox(height: 25),
+                        // 카테고리 목록
+                        _buildCategoryList(context),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 25),
-                  // 카테고리 목록
-                  _buildCategoryList(context),
-                  const SizedBox(height: 25),
+                  const CustomDivider(height: 10, bottom: 0),
                   // 광고
-                  const KakaoBannerAd(),
-                  const SizedBox(height: 20),
-                  // 즐겨찾기 헤더
-                  _buildBookmarkHeader(),
-                  const SizedBox(height: 15),
-                  Obx(
-                    () => controller.isLoaded.value
-                        ? controller.bookmarkList.isNotEmpty
-                            ? _buildBookmarkList()
-                            : _buildNoBookmarkBox()
-                        : const SizedBox(
-                            height: 200,
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: primaryColor,
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          ),
+                  _buildKakaoBannerAd(),
+                  const CustomDivider(height: 10, top: 0),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+                    child: Column(
+                      children: [
+                        // 즐겨찾기 헤더
+                        _buildBookmarkHeader(),
+                        const SizedBox(height: 15),
+                        Obx(
+                          () => controller.loaded.value
+                              ? controller.bookmarkList.isNotEmpty
+                                  ? _buildBookmarkList()
+                                  : _buildNoBookmarkBox()
+                              : const SizedBox(
+                                  height: 200,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: primaryColor,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -196,6 +210,44 @@ class HomePage extends GetView<MainController> {
       onTap: () {
         controller.changeIndex(1);
       },
+    );
+  }
+
+  Widget _buildKakaoBannerAd() {
+    return Stack(
+      children: [
+        Container(
+          width: double.infinity,
+          height: 100,
+          color: blueGrey,
+          child: const Center(
+            child: Text('테이블나우'),
+          ),
+        ),
+        Positioned(
+          child: SizedBox(
+            width: double.infinity,
+            child: AdFitBanner(
+              adId: 'DAN-7DN8T9jTw7bTvG3H',
+              adSize: AdFitBannerSize.BANNER,
+              listener: (AdFitEvent event, AdFitEventData data) {
+                switch (event) {
+                  case AdFitEvent.AdReceived:
+                    break;
+                  case AdFitEvent.AdClicked:
+                    break;
+                  case AdFitEvent.AdReceiveFailed:
+                    print('카카오 애드핏 광고 노출 실패');
+                    break;
+                  case AdFitEvent.OnError:
+                    print('카카오 애드핏 광고 초기화 실패');
+                    break;
+                }
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 
