@@ -7,6 +7,7 @@ import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/kakao_banner_ad.dart';
 import 'package:table_now/ui/components/loading_indicator.dart';
 import 'package:table_now/ui/components/location_bar.dart';
+import 'package:table_now/ui/components/network_disconnected_text.dart';
 import 'package:table_now/ui/components/show_toast.dart';
 import 'package:table_now/ui/components/sort_dropdown.dart';
 import 'package:table_now/ui/components/state_filter.dart';
@@ -69,18 +70,21 @@ class SearchResultsPage extends GetView<SearchController> {
                     const SizedBox(height: 15),
                     // 검색매장 목록
                     Obx(
-                      () => _storeController.loaded.value
-                          ? Expanded(
-                              child:
-                                  _storeController.filteredStoreList.isNotEmpty
-                                      ? _buildResultsStoreList()
-                                      : _storeController.connected.value
-                                          ? _buildNoStoreBox()
-                                          : const Center(
-                                              child: Text('네트워크 연결을 확인해 주세요.'),
-                                            ),
-                            )
-                          : const LoadingIndicator(height: 200),
+                      () => Expanded(
+                        child: _storeController.loaded.value
+                            ? _storeController.connected.value
+                                ? _storeController.filteredStoreList.isNotEmpty
+                                    ? _buildResultsStoreList()
+                                    : _buildNoStoreBox()
+                                : NetworkDisconnectedText(
+                                    retryFunc: () {
+                                      // 검색매장 전체조회 (비동기 호출)
+                                      _storeController.findAllByName(
+                                          controller.search.text);
+                                    },
+                                  )
+                            : const LoadingIndicator(),
+                      ),
                     ),
                   ],
                 ),

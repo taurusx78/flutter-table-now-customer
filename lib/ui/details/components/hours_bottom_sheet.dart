@@ -4,12 +4,15 @@ import 'package:table_now/controller/details_controller.dart';
 import 'package:table_now/ui/components/custom_divider.dart';
 import 'package:table_now/ui/components/list_row_text.dart';
 import 'package:table_now/ui/components/loading_indicator.dart';
+import 'package:table_now/ui/components/network_disconnected_text.dart';
 import 'package:table_now/ui/custom_color.dart';
 import 'package:table_now/ui/details/components/time_row_text.dart';
 import 'package:table_now/ui/screen_size.dart';
 
 class HoursBottomSheet extends GetView<DetailsController> {
-  HoursBottomSheet({Key? key}) : super(key: key);
+  final int storeId;
+
+  HoursBottomSheet({Key? key, required this.storeId}) : super(key: key);
 
   List<String> days = ['월', '화', '수', '목', '금', '토', '일'];
 
@@ -44,8 +47,8 @@ class HoursBottomSheet extends GetView<DetailsController> {
                         padding: EdgeInsets.only(left: 5, top: 3),
                         child: Icon(
                           Icons.help_outline_rounded,
-                          color: Colors.black54,
-                          size: 20,
+                          color: primaryColor,
+                          size: 18,
                         ),
                       ),
                       onTap: () {
@@ -82,12 +85,19 @@ class HoursBottomSheet extends GetView<DetailsController> {
                     ),
                   );
                 } else {
-                  return const Center(
-                    child: Text('네트워크 연결을 확인해 주세요.'),
+                  return Expanded(
+                    child: NetworkDisconnectedText(
+                      retryFunc: () {
+                        // 영업시간 전체조회 (비동기 조회)
+                        controller.findHours(storeId);
+                      },
+                    ),
                   );
                 }
               } else {
-                return const LoadingIndicator(height: 200);
+                return const Expanded(
+                  child: LoadingIndicator(),
+                );
               }
             },
           ),

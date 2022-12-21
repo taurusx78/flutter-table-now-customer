@@ -9,6 +9,7 @@ import 'package:table_now/data/category.dart';
 import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/category_item.dart';
 import 'package:table_now/ui/components/custom_divider.dart';
+import 'package:table_now/ui/components/loading_indicator.dart';
 import 'package:table_now/ui/components/location_bar.dart';
 import 'package:table_now/ui/components/show_toast.dart';
 import 'package:table_now/ui/components/state_round_box.dart';
@@ -73,18 +74,12 @@ class HomePage extends GetView<MainController> {
                         const SizedBox(height: 15),
                         Obx(
                           () => controller.loaded.value
-                              ? controller.bookmarkList.isNotEmpty
-                                  ? _buildBookmarkList()
-                                  : _buildNoBookmarkBox()
-                              : const SizedBox(
-                                  height: 200,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: primaryColor,
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                ),
+                              ? controller.connected.value
+                                  ? controller.bookmarkList.isNotEmpty
+                                      ? _buildBookmarkList()
+                                      : _buildNoBookmarkBox()
+                                  : _buildNetworkDisconnectedBox()
+                              : const LoadingIndicator(height: 200),
                         ),
                       ],
                     ),
@@ -381,6 +376,36 @@ class HomePage extends GetView<MainController> {
             SizedBox(height: 10),
             Text(
               '관심 매장을 등록해 보세요!',
+              style: TextStyle(fontSize: 16, color: Colors.black54),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNetworkDisconnectedBox() {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+        side: const BorderSide(color: blueGrey, width: 1),
+      ),
+      elevation: 0.5,
+      color: Colors.white,
+      child: SizedBox(
+        width: 600,
+        height: 170,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/images/icons/error_small.png',
+              width: 35,
+              color: darkNavy,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              '네트워크 연결 상태를 확인해 주세요.',
               style: TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ],

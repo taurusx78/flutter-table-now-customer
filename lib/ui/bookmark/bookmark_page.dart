@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:table_now/controller/main_controller.dart';
 import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/kakao_banner_ad.dart';
+import 'package:table_now/ui/components/loading_indicator.dart';
+import 'package:table_now/ui/components/network_disconnected_text.dart';
 import 'package:table_now/ui/components/store_item.dart';
 import 'package:table_now/ui/custom_color.dart';
 
@@ -33,24 +35,17 @@ class BookmarkPage extends GetView<MainController> {
       ),
       body: Obx(
         () => controller.loaded.value
-            ? controller.bookmarkList.isNotEmpty
-                ? _buildBookmarkList()
-                : controller.connected.value
-                    ? _buildNoBookmarkBox()
-                    : const Center(
-                        child: Text('네트워크 연결을 확인해 주세요.'),
-                      )
-            : Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    CircularProgressIndicator(
-                      color: primaryColor,
-                      strokeWidth: 2,
-                    ),
-                  ],
-                ),
-              ),
+            ? controller.connected.value
+                ? controller.bookmarkList.isNotEmpty
+                    ? _buildBookmarkList()
+                    : _buildNoBookmarkBox()
+                : NetworkDisconnectedText(
+                    retryFunc: () {
+                      // 즐겨찾기 전체조회 (비동기 호출)
+                      controller.findAllBookmark(true);
+                    },
+                  )
+            : const LoadingIndicator(),
       ),
     );
   }

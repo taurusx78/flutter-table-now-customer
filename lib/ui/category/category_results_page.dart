@@ -6,6 +6,7 @@ import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/kakao_banner_ad.dart';
 import 'package:table_now/ui/components/loading_indicator.dart';
 import 'package:table_now/ui/components/location_bar.dart';
+import 'package:table_now/ui/components/network_disconnected_text.dart';
 import 'package:table_now/ui/components/show_toast.dart';
 import 'package:table_now/ui/components/sort_dropdown.dart';
 import 'package:table_now/ui/components/state_filter.dart';
@@ -76,17 +77,20 @@ class CategoryResultsPage extends GetView<StoreController> {
               const SizedBox(height: 15),
               // 검색매장 목록
               Obx(
-                () => controller.loaded.value
-                    ? Expanded(
-                        child: controller.filteredStoreList.isNotEmpty
-                            ? _buildResultsStoreList()
-                            : controller.connected.value
-                                ? _buildNoStoreBox()
-                                : const Center(
-                                    child: Text('네트워크 연결을 확인해 주세요.'),
-                                  ),
-                      )
-                    : const LoadingIndicator(height: 200),
+                () => Expanded(
+                  child: controller.loaded.value
+                      ? controller.connected.value
+                          ? controller.filteredStoreList.isNotEmpty
+                              ? _buildResultsStoreList()
+                              : _buildNoStoreBox()
+                          : NetworkDisconnectedText(
+                              retryFunc: () {
+                                // 카테고리 매장 전체조회 (비동기 실행)
+                                controller.findAllByCategory(category);
+                              },
+                            )
+                      : const LoadingIndicator(),
+                ),
               ),
             ],
           ),

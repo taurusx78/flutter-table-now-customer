@@ -53,8 +53,8 @@ class NaverBlogList extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: primaryColor.withOpacity(0.1)),
-              color: const Color(0xFFF5FAFD),
+              border: Border.all(color: blueGrey),
+              color: Colors.white,
             ),
             child: Padding(
               padding: const EdgeInsets.all(15),

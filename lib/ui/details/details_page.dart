@@ -9,6 +9,7 @@ import 'package:table_now/route/routes.dart';
 import 'package:table_now/ui/components/custom_dialog.dart';
 import 'package:table_now/ui/components/custom_divider.dart';
 import 'package:table_now/ui/components/loading_indicator.dart';
+import 'package:table_now/ui/components/network_disconnected_text.dart';
 import 'package:table_now/ui/components/show_toast.dart';
 import 'package:table_now/ui/custom_color.dart';
 import 'package:table_now/ui/details/components/hours_bottom_sheet.dart';
@@ -96,12 +97,15 @@ class DetailsPage extends GetView<DetailsController> {
                 ),
               );
             } else {
-              return const Center(
-                child: Text('네트워크 연결을 확인해 주세요.'),
+              return NetworkDisconnectedText(
+                retryFunc: () {
+                  // 매장 상세조회 (비동기 조회)
+                  controller.findById(storeId);
+                },
               );
             }
           } else {
-            return const LoadingIndicator(height: 200);
+            return const LoadingIndicator();
           }
         }),
         floatingActionButton: Obx(
@@ -210,8 +214,9 @@ class DetailsPage extends GetView<DetailsController> {
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 10),
           // 주소
           Text(
             store.address + ', ' + store.detailAddress,
@@ -219,8 +224,9 @@ class DetailsPage extends GetView<DetailsController> {
               fontSize: 16,
               color: Colors.black54,
             ),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 20),
           RichText(
             text: TextSpan(
               style: const TextStyle(fontSize: 15, color: Colors.black),
@@ -383,7 +389,7 @@ class DetailsPage extends GetView<DetailsController> {
                 '전체보기',
                 style: TextStyle(color: primaryColor),
               ),
-              onTap: () async {
+              onTap: () {
                 // 영업시간 전체조회 (비동기 조회)
                 controller.findHours(storeId);
                 // 전체 영업정보 BottomSheet
@@ -391,7 +397,7 @@ class DetailsPage extends GetView<DetailsController> {
                   backgroundColor: Colors.transparent,
                   context: context,
                   builder: (context) {
-                    return HoursBottomSheet();
+                    return HoursBottomSheet(storeId: storeId);
                   },
                 );
               },
@@ -411,17 +417,24 @@ class DetailsPage extends GetView<DetailsController> {
                         : controller.businessHours.value,
                   ),
                   const SizedBox(height: 10),
-                  TimeRowText(title: '휴게시간', info: controller.breakTime.value),
+                  TimeRowText(
+                    title: '휴게시간',
+                    info: controller.breakTime.value,
+                  ),
                   if (controller.lastOrder.value != '없음')
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: TimeRowText(
-                          title: '주문마감', info: controller.lastOrder.value),
+                        title: '주문마감',
+                        info: controller.lastOrder.value,
+                      ),
                     ),
                 ],
               )
             : TimeRowText(
-                title: '영업시간', info: '오늘은 ${controller.state.value}입니다.'),
+                title: '영업시간',
+                info: '오늘은 ${controller.state.value}입니다.',
+              ),
       ],
     );
   }
@@ -542,7 +555,7 @@ class DetailsPage extends GetView<DetailsController> {
               ],
             ),
             Text(
-              '전체테이블: $allTableCount',
+              '전체테이블 수: $allTableCount',
               style: const TextStyle(color: Colors.black54),
             ),
           ],

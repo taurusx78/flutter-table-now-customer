@@ -21,44 +21,47 @@ class NoticeSwiper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(15, 20, 15, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 알림 헤더
-          Row(
-            children: [
-              const Text(
-                '알림',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                '${noticeList.length}개',
-                style: const TextStyle(color: primaryColor),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          // 알림 목록
-          SizedBox(
-            height: 110, // 높이 지정 필수!
-            child: Swiper(
-              itemCount: noticeList.length,
-              itemBuilder: (context, index) {
-                return _buildNoticeItem(context, noticeList[index]);
-              },
-              onIndexChanged: (index) {
-                controller.changeCurNoticeIndex(index);
-              },
-              viewportFraction: 1,
-              scale: 0.8,
-              loop: false,
+    return Container(
+      color: lightGrey,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 알림 헤더
+            Row(
+              children: [
+                const Text(
+                  '알림',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  '${noticeList.length}개',
+                  style: const TextStyle(color: primaryColor),
+                ),
+              ],
             ),
-          ),
-          const CustomDivider(top: 20, bottom: 0),
-        ],
+            const SizedBox(height: 10),
+            // 알림 목록
+            SizedBox(
+              height: 110, // 높이 지정 필수!
+              child: Swiper(
+                itemCount: noticeList.length,
+                itemBuilder: (context, index) {
+                  return _buildNoticeItem(context, noticeList[index]);
+                },
+                onIndexChanged: (index) {
+                  controller.changeCurNoticeIndex(index);
+                },
+                viewportFraction: 1,
+                scale: 0.8,
+                loop: false,
+              ),
+            ),
+            const CustomDivider(top: 15, bottom: 0),
+          ],
+        ),
       ),
     );
   }
@@ -77,7 +80,7 @@ class NoticeSwiper extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
               border: Border.all(color: blueGrey),
-              color: lightGrey2,
+              color: Colors.white,
             ),
             child: Row(
               children: [
@@ -98,8 +101,12 @@ class NoticeSwiper extends StatelessWidget {
                   ),
                 Container(
                   width: existImage
-                      ? getScreenWidth(context) - 152
-                      : getScreenWidth(context) - 52,
+                      ? getScreenWidth(context) < 600
+                          ? getScreenWidth(context) - 152
+                          : 600 - 152
+                      : getScreenWidth(context) < 600
+                          ? getScreenWidth(context) - 52
+                          : 600 - 52,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
                   child: Column(
@@ -163,7 +170,7 @@ class NoticeSwiper extends StatelessWidget {
                   topRight: Radius.circular(4),
                   bottomLeft: Radius.circular(4),
                 ),
-                color: Colors.black45,
+                color: Colors.black54,
               ),
               child: Obx(
                 () => Text(
@@ -208,72 +215,74 @@ class NoticeSwiper extends StatelessWidget {
                 height: existImage
                     ? getScreenHeight(context) * 0.55
                     : getScreenHeight(context) * 0.3,
-                child: ListView(
-                  children: [
-                    // 첨부사진이 있는 경우
-                    if (notice.imageUrlList.isNotEmpty)
-                      SizedBox(
-                        height: getScreenHeight(context) * 0.3,
-                        child: _buildNoticeImageList(notice.imageUrlList),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  // 알림 라벨
-                                  const NoticeRoundText(title: '알림'),
-                                  // 휴무 라벨
-                                  if (hasHoliday)
-                                    const Padding(
-                                      padding: EdgeInsets.only(left: 8),
-                                      child: NoticeRoundText(title: '휴무'),
-                                    ),
-                                ],
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 15),
+                  child: ListView(
+                    children: [
+                      // 첨부사진이 있는 경우
+                      if (notice.imageUrlList.isNotEmpty)
+                        SizedBox(
+                          height: getScreenHeight(context) * 0.3,
+                          child: _buildNoticeImageList(notice.imageUrlList),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    // 알림 라벨
+                                    const NoticeRoundText(title: '알림'),
+                                    // 휴무 라벨
+                                    if (hasHoliday)
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 8),
+                                        child: NoticeRoundText(title: '휴무'),
+                                      ),
+                                  ],
+                                ),
+                                // 알림 등록일
+                                Text(
+                                  notice.createdDate,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const CustomDivider(top: 15, bottom: 20),
+                            // 제목
+                            Text(
+                              notice.title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
-                              // 알림 등록일
-                              Text(
-                                notice.createdDate,
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black54,
+                            ),
+                            // 휴무 알림인 경우
+                            if (hasHoliday)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: _buildHolidayText(
+                                  notice.holidayStartDate,
+                                  notice.holidayEndDate,
+                                  20,
+                                  16,
                                 ),
                               ),
-                            ],
-                          ),
-                          const CustomDivider(top: 15, bottom: 20),
-                          // 제목
-                          Text(
-                            notice.title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          // 휴무 알림인 경우
-                          if (hasHoliday)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: _buildHolidayText(
-                                notice.holidayStartDate,
-                                notice.holidayEndDate,
-                                20,
-                                16,
-                              ),
-                            ),
-                          const SizedBox(height: 15),
-                          // 내용
-                          Text(notice.content),
-                        ],
+                            const SizedBox(height: 15),
+                            // 내용
+                            Text(notice.content),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },
@@ -287,6 +296,7 @@ class NoticeSwiper extends StatelessWidget {
       double iconSize, double fontSize) {
     return RichText(
       text: TextSpan(
+        style: TextStyle(fontSize: fontSize, color: darkNavy2),
         children: [
           const WidgetSpan(
             alignment: PlaceholderAlignment.middle,
@@ -300,13 +310,10 @@ class NoticeSwiper extends StatelessWidget {
             ),
           ),
           TextSpan(
-            text:
-                '${holidayStart.substring(2)} - ${holidayEnd.substring(2)} 휴무',
-            style: TextStyle(
-              fontSize: fontSize,
-              color: darkNavy2,
-            ),
-          )
+            text: '${holidayStart.substring(2)} - ${holidayEnd.substring(2)}',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const TextSpan(text: ' 휴무')
         ],
       ),
       overflow: TextOverflow.ellipsis,

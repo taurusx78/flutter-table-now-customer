@@ -112,7 +112,7 @@ class StoreItem extends StatelessWidget {
           ],
         ),
       ),
-      onTap: () async {
+      onTap: () {
         // 매장 상세조회 (비동기 조회)
         Get.put(DetailsController()).findById(store.id);
         Get.toNamed(Routes.details, arguments: store.id);
