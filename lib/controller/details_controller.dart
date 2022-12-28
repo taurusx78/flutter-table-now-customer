@@ -18,7 +18,8 @@ class DetailsController extends GetxController {
   final RxString breakTime = ''.obs; // 오늘의 휴게시간
   final RxString lastOrder = ''.obs; // 오늘의 주문마감시간
 
-  final RxBool loaded = true.obs; // 상세보기 조회 완료 여부
+  // 상세보기 조회 응답 코드 (조회 전 (0), 조회 완료 (200), 매장 없음 (404), 네트워크 연결 안됨 (500))
+  final RxInt loadedCode = 0.obs;
   final RxBool bookmarked = false.obs; // 즐겨찾기 포함 여부
 
   HoursRespDto? weeklyHours; // 전체 영업시간
@@ -74,9 +75,10 @@ class DetailsController extends GetxController {
 
   // 매장 상세조회
   Future<void> findById(int storeId) async {
-    loaded.value = false;
-    store = await _storeRepository.findById(storeId);
-    if (store != null) {
+    loadedCode.value = 0;
+    var result = await _storeRepository.findById(storeId);
+    if (result.runtimeType == Store) {
+      store = result;
       // 즐겨찾기 포함 여부 조회
       await checkIsBookmarked(storeId);
       state.value = store!.state;
@@ -88,8 +90,9 @@ class DetailsController extends GetxController {
       // 앱바 색상 초기화
       appBarIconColor.value = Colors.white;
       appBarTextColor.value = Colors.transparent;
+      result = 200;
     }
-    loaded.value = true;
+    loadedCode.value = result;
   }
 
   // 즐겨찾기 포함 여부 조회
@@ -130,7 +133,7 @@ class DetailsController extends GetxController {
   }
 
   // 영업상태 업데이트
-  Future<StateRespDto?> updateState(int storeId) async {
+  Future<int> updateState(int storeId) async {
     var result = await _storeRepository.updateState(storeId);
     if (result.runtimeType == StateRespDto) {
       state.value = result!.state;
@@ -139,6 +142,7 @@ class DetailsController extends GetxController {
       businessHours.value = result.businessHours;
       breakTime.value = result.breakTime;
       lastOrder.value = result.lastOrder;
+      result == 200;
     }
     return result;
   }

@@ -22,12 +22,17 @@ class NetworkDisconnectedText extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           const Text(
-            '네트워크 연결이 원활하지 않습니다.',
+            '네트워크 연결이 원활하지 않거나',
             style: TextStyle(fontSize: 16, color: Colors.black),
           ),
           const SizedBox(height: 10),
           const Text(
-            '네트워크 연결 상태를 확인해주세요.',
+            '예기치 못한 오류가 발생했습니다.',
+            style: TextStyle(fontSize: 16, color: Colors.black),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            '잠시후 다시 시도해 주세요.',
             style: TextStyle(fontSize: 14, color: Colors.black54),
           ),
           const SizedBox(height: 20),

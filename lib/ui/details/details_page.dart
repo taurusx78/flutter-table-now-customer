@@ -31,8 +31,8 @@ class DetailsPage extends GetView<DetailsController> {
     return SafeArea(
       child: Scaffold(
         body: Obx(() {
-          if (controller.loaded.value) {
-            if (controller.store != null) {
+          if (controller.loadedCode.value != 0) {
+            if (controller.loadedCode.value == 200) {
               Store store = controller.store!;
               return Align(
                 alignment: Alignment.topCenter,
@@ -96,6 +96,8 @@ class DetailsPage extends GetView<DetailsController> {
                   ),
                 ),
               );
+            } else if (controller.loadedCode.value == 404) {
+              return _buildNoStoreBox();
             } else {
               return NetworkDisconnectedText(
                 retryFunc: () {
@@ -122,10 +124,12 @@ class DetailsPage extends GetView<DetailsController> {
         controller.changeTurns();
         // 영업상태 업데이트
         var result = await controller.updateState(storeId);
-        if (result != null) {
+        if (result == 200) {
           showToast(context, '영업정보가 업데이트 되었습니다.', null);
+        } else if (result == 500) {
+          showToast(context, '네트워크 연결 상태를 확인해 주세요.', 2000);
         } else {
-          showToast(context, '네트워크 연결을 확인해 주세요.', 2000);
+          showToast(context, '오류가 발생했습니다.\n잠시후 다시 시도해 주세요.', 2000);
         }
       },
       backgroundColor: Colors.blueGrey,
@@ -733,17 +737,37 @@ class DetailsPage extends GetView<DetailsController> {
             Navigator.pop(context2); // alertDialog 닫기
             // 매장정보 수정제안
             controller.requestUpdate(storeId).then((result) {
-              if (result == 1) {
+              if (result == 200) {
                 showToast(context, '메일이 전송되었습니다.', null);
-              } else if (result == -1) {
-                showToast(context, '부적절한 접근이 감지되었습니다.\n다시 시도해 주세요.', 3000);
-              } else if (result == -3) {
-                showToast(context, '네트워크 연결을 확인해 주세요.', 2000);
+              } else if (result == 500) {
+                showToast(context, '네트워크 연결 상태를 확인해 주세요.', 2000);
+              } else {
+                showToast(context, '오류가 발생했습니다.\n잠시후 다시 시도해 주세요.', 2000);
               }
             });
           },
         );
       },
+    );
+  }
+
+  Widget _buildNoStoreBox() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/images/error_big.png',
+            width: 50,
+            color: darkNavy,
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            '매장이 존재하지 않습니다.',
+            style: TextStyle(fontSize: 16, color: Colors.black),
+          ),
+        ],
+      ),
     );
   }
 }

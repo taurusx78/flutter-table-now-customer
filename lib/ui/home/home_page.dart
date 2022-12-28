@@ -135,7 +135,10 @@ class HomePage extends GetView<MainController> {
         ),
       ),
       onTap: () {
-        Get.toNamed(Routes.search);
+        Get.toNamed(Routes.search)!.then((value) {
+          // 즐겨찾기 5개 조회
+          controller.findAllBookmark(false);
+        });
       },
     );
   }
@@ -349,7 +352,10 @@ class HomePage extends GetView<MainController> {
       onTap: () async {
         // 매장 상세조회 (비동기 조회)
         Get.put(DetailsController()).findById(store.id);
-        Get.toNamed(Routes.details, arguments: store.id);
+        Get.toNamed(Routes.details, arguments: store.id)!.then((value) {
+          // 즐겨찾기 5개 조회
+          controller.findAllBookmark(false);
+        });
       },
     );
   }

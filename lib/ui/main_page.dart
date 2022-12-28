@@ -11,9 +11,9 @@ class MainPage extends GetView<MainController> {
   MainPage({Key? key}) : super(key: key);
 
   final List<Widget> pages = [
-    HomePage(),
+    const HomePage(),
     const CategoryPage(),
-    BookmarkPage(),
+    const BookmarkPage(),
     const AppInfoPage(),
   ];
 

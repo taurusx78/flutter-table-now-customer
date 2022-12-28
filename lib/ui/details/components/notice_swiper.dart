@@ -199,7 +199,7 @@ class NoticeSwiper extends StatelessWidget {
       context, Notice notice, bool existImage, bool hasHoliday) {
     showDialog(
       context: context,
-      barrierColor: Colors.white70,
+      barrierColor: Colors.black54,
       builder: (context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
