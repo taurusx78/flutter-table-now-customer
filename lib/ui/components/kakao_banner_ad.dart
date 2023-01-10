@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adfit/flutter_adfit.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:table_now/ui/custom_color.dart';
 
 class KakaoBannerAd extends StatelessWidget {
@@ -29,7 +30,7 @@ class KakaoBannerAd extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: AdFitBanner(
-                adId: 'DAN-7DN8T9jTw7bTvG3H',
+                adId: dotenv.env['kakaoAdfitBannerCode']!,
                 adSize: AdFitBannerSize.BANNER,
                 listener: (AdFitEvent event, AdFitEventData data) {
                   switch (event) {

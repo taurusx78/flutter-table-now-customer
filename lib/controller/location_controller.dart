@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,9 +46,9 @@ class LocationController extends GetxController {
       // 네이버 API 통신을 위한 헤더 설정
       Map<String, String> headers = {
         // Client ID
-        'X-NCP-APIGW-API-KEY-ID': 'xp4321t0oj',
+        'X-NCP-APIGW-API-KEY-ID': dotenv.env['naverMapClientId']!,
         // Client Secret
-        'X-NCP-APIGW-API-KEY': 'otkaLK0p58qTf9UrTeNvAc4s4VJ6nkA9Dwhi22QU',
+        'X-NCP-APIGW-API-KEY': dotenv.env['naverMapClientSecret']!,
       };
       // 위도/경도를 지번주소로 변환 (네이버 API)
       dynamic response = await http.get(

@@ -73,7 +73,9 @@ class CategoryResultsPage extends GetView<StoreController> {
               ),
               const SizedBox(height: 20),
               // 검색결과 헤더
-              Obx(() => _buildResultsHeader()),
+              Obx(
+                () => _buildResultsHeader(context),
+              ),
               const SizedBox(height: 15),
               // 검색매장 목록
               Obx(
@@ -99,8 +101,8 @@ class CategoryResultsPage extends GetView<StoreController> {
     );
   }
 
-  Widget _buildResultsHeader() {
-    return Column(
+  Widget _buildResultsHeader(context) {
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -109,23 +111,16 @@ class CategoryResultsPage extends GetView<StoreController> {
         ),
         if (controller.curFilterIndex.value == 1)
           Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: RichText(
-              text: const TextSpan(
-                children: [
-                  WidgetSpan(
-                    child: Icon(
-                      Icons.info_outline_rounded,
-                      color: primaryColor,
-                      size: 18,
-                    ),
-                  ),
-                  TextSpan(
-                    text: ' 잔여테이블 정보를 제공하지 않는 매장은 제외됩니다.',
-                    style: TextStyle(color: Colors.black54),
-                  )
-                ],
+            padding: const EdgeInsets.only(left: 5, top: 2),
+            child: InkWell(
+              child: const Icon(
+                Icons.help_outline_rounded,
+                color: primaryColor,
+                size: 18,
               ),
+              onTap: () {
+                showHelpDialog(context);
+              },
             ),
           ),
       ],
@@ -161,6 +156,45 @@ class CategoryResultsPage extends GetView<StoreController> {
         '검색 결과가 없습니다.',
         style: TextStyle(fontSize: 16, color: Colors.black54),
       ),
+    );
+  }
+
+  void showHelpDialog(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Dialog 밖의 화면 터치 못하도록 설정
+      builder: (BuildContext context2) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Text(
+                '테이블 정보를 제공하지 않는 매장은 검색 결과에서 제외됩니다.',
+              ),
+            ],
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 5),
+          actions: [
+            TextButton(
+              child: const Text(
+                '확인',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(context2); // alertDialog 닫기
+              },
+            ),
+          ],
+          actionsPadding: EdgeInsets.zero,
+        );
+      },
     );
   }
 }
